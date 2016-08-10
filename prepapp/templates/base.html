@@ -5,33 +5,42 @@
     <title>{% block siteTitle %}{% endblock %}</title>
     <!-- Compiled and minified jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <!-- Compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css"
-          media="screen,projection">
-    <!-- Compiled and minified JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    {#    {% block headExtras %}{% endblock %}#}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue-deep_purple.min.css">
+    <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+    <style>
+        .page-content {
+            width: 79%;
+            margin: auto;
+        }
+    </style>
+{% block headExtras %}
+
+{% endblock %}
 </head>
 <body>
-<nav class="indigo z-depth-3">
-    <div class="nav-wrapper">
-        <a href="{% url "home" %}" class="brand-logo center">{% block pageTitle %}{% endblock %}</a>
-        <ul id="nav-mobile" class="right">
-            <li><a href="AAA"><i class="material-icons">search</i></a></li>
-            <li><a href="BBB"><i class="material-icons">view_module</i></a></li>
-            <li><a href="CCC"><i class="material-icons">refresh</i></a></li>
-            <li>
-                <div style="margin-top: 7px; height: 50px; width: 2px; background-color: #fafafa;"></div>
-            </li>
-            <li><a href="AAA">Sass</a></li>
-            <li><a href="BBB">Components</a></li>
-            <li><a href="CCC">JavaScript</a></li>
-        </ul>
+
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">{% block pageTitle %}{% endblock %}</span>
+            <div class="mdl-layout-spacer"></div>
+            {% block appbar_actions %}{% endblock %}
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+        <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="">Link</a>
+            <a class="mdl-navigation__link" href="">Link</a>
+            <a class="mdl-navigation__link" href="">Link</a>
+            <a class="mdl-navigation__link" href="">Link</a>
+        </nav>
     </div>
-</nav>
-<div class="container">
-    {% block pageContent %}{% endblock %}
+    <main class="mdl-layout__content">
+        <div class="page-content">{% block pageContent %}{% endblock %}</div>
+    </main>
 </div>
 
 </body>
