@@ -15,7 +15,7 @@ class Socio(models.Model):
     nroSocio = models.IntegerField(primary_key=True)
     razonSocial = models.CharField(max_length=140)
     domicilio = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=15)
+    telefono = models.CharField(max_length=15, blank=True)
     fechaCreacion = models.DateField(auto_now_add=True)
     localidad = models.IntegerField(choices=LOCALIDAD_CHOICES)
     activo = models.BooleanField(default=True)
