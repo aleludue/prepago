@@ -20,6 +20,12 @@ class Socio(models.Model):
     localidad = models.IntegerField(choices=LOCALIDAD_CHOICES)
     activo = models.BooleanField(default=True)
 
+    def __unicode__(self):
+        return '%s - %s'%(self.nroSocio, self.razonSocial)
+
+    class Admin:
+        pass
+
 
 class Terreno(models.Model):
     CONDICION_IVA_CHOICES = (('RINS', 'Responsable Inscripto'),
@@ -35,21 +41,45 @@ class Terreno(models.Model):
     nroMedidorEnergia = models.CharField(max_length=30)
     activo = models.BooleanField(default=True)
     cargoConsumoAgua = models.BooleanField(default=True)
+    tarifa = models.ForeignKey('Tarifa')
+
+    def __unicode__(self):
+        return self.nroTerreno
+
+    class Admin:
+        pass
 
 class RecambioMedidor(models.Model):
     terreno = models.ForeignKey(Terreno)
     fecha = models.DateField(default=timezone.now())
     nroMedidor = models.CharField(max_length=30)
 
+    def __unicode__(self):
+        return '%s - %s' % (self.terreno, self.nroMedidor)
+
+    class Admin:
+        pass
+
 class Tarifa(models.Model):
     nombre = models.CharField(max_length=30)
-    terreno = models.ForeignKey(Terreno)
+
+    def __unicode__(self):
+        return self.nombre
+
+    class Admin:
+        pass
 
 class EscalonesEnergia(models.Model):
     tarifa = models.ForeignKey(Tarifa)
     desde = models.IntegerField()
     hasta = models.IntegerField()
     valor = models.FloatField()
+
+    def __unicode__(self):
+        return '%s - %s a %s' % (self.tarifa, self.desde, self.hasta)
+
+    class Admin:
+        pass
 
 class Items(models.Model):
     TIPOS_CHOICES = (('FIJ', 'Fijo'),
@@ -64,6 +94,12 @@ class Items(models.Model):
     valor = models.FloatField()
     tarifa = models.ManyToManyField(Tarifa, through='Gravamen')
 
+    def __unicode__(self):
+        return self.nombre
+
+    class Admin:
+        pass
+
 class Gravamen(models.Model):
     IVA_CHOICES = (('IVA21', 'IVA 21%'),
                    ('IVA27', 'IVA 27%'),
@@ -75,8 +111,11 @@ class Gravamen(models.Model):
     iva = models.CharField(max_length=5, choices=IVA_CHOICES)
 
 class Cesp(models.Model):
-    nroCesp = models.IntegerField(primary_key=True)
+    nroCesp = models.CharField(primary_key=True, max_length=50)
     fecha = models.DateField()
+
+    def __unicode__(self):
+        return self.nroCesp
 
 class Factura(models.Model):
     nroFactura = models.CharField(max_length=50, primary_key=True)
@@ -86,6 +125,12 @@ class Factura(models.Model):
     cesp = models.ForeignKey(Cesp)
     tarifa = models.ForeignKey(Tarifa)
     items = models.ManyToManyField(Items, through='Factura_Items')
+
+    def __unicode__(self):
+        return self.nroFactura
+
+    class Admin:
+        pass
 
 class Factura_Items(models.Model):
     nroFactura = models.ForeignKey(Factura)
