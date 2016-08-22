@@ -1,6 +1,6 @@
 from django import forms
 
-from prepapp.models import Socio
+from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Items, Cesp
 
 
 class MDLBaseModelForm(forms.ModelForm):
@@ -31,4 +31,29 @@ class MDLBaseModelForm(forms.ModelForm):
 class SociosForm(MDLBaseModelForm):
     class Meta:
         model = Socio
-        fields = ['nroSocio', 'razonSocial', 'domicilio', 'localidad']
+        fields = ['nroSocio', 'razonSocial', 'domicilio', 'localidad', 'telefono']
+
+class TerrenosForm(MDLBaseModelForm):
+    class Meta:
+        model = Terreno
+        fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua', 'tarifa']
+
+class TarifasForm(MDLBaseModelForm):
+    class Meta:
+        model = Tarifa
+        fields = ['nombre']
+
+class EscalonesEnergiaForm(MDLBaseModelForm):
+    class Meta:
+        model = EscalonesEnergia
+        fields = ['tarifa', 'desde', 'hasta', 'valor']
+
+class ItemsForm(MDLBaseModelForm):
+    class Meta:
+        model = Items
+        fields = ['nombre', 'tipo', 'aplicacion', 'valor']
+
+class CespForm(MDLBaseModelForm):
+    class Meta:
+        model = Cesp
+        fields = ['nroCesp', 'fecha']

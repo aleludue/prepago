@@ -4,7 +4,8 @@ from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 
-from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia
+from prepapp.forms import SociosForm, TerrenosForm, TarifasForm, EscalonesEnergiaForm, ItemsForm, CespForm
+from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Items, Cesp
 
 
 class SociosList(TemplateView):
@@ -13,40 +14,62 @@ class SociosList(TemplateView):
 class SociosAlta(CreateView):
     template_name = "socios/socios_form.html"
     model = Socio
-    fields = ['nroSocio', 'razonSocial', 'domicilio', 'telefono', 'localidad']
+    form_class = SociosForm
 
 class SociosModificar(UpdateView):
     template_name = "socios/socios_form.html"
     model = Socio
-    fields = ['nroSocio', 'razonSocial', 'domicilio', 'telefono', 'localidad']
-
+    form_class = SociosForm
 
 class TerrenoAlta(CreateView):
     template_name = "terrenos/terrenos_form.html"
     model = Terreno
-    fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua', 'tarifa']
+    form_class = TerrenosForm
 
 class TerrenoModificar(UpdateView):
     template_name = "terrenos/terrenos_form.html"
     model = Terreno
-    fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua', 'tarifa']
+    form_class = TerrenosForm
 
 class TarifaAlta(CreateView):
     template_name = "tarifas/tarifas_form.html"
     model = Tarifa
-    fields = ['nombre']
+    form_class = TarifasForm
 
 class TarifaModificar(UpdateView):
     template_name = "tarifas/tarifas_form.html"
     model = Tarifa
-    fields = ['nombre']
+    form_class = TarifasForm
 
 class EscalonesEnergiaAlta(CreateView):
     template_name = "escalonesenergia/escalonesenergia_form.html"
     model = EscalonesEnergia
-    fields = ['tarifa', 'desde', 'hasta', 'valor']
+    form_class = EscalonesEnergiaForm
 
 class EscalonesEnergiaModificar(UpdateView):
     template_name = "escalonesenergia/escalonesenergia_form.html"
     model = EscalonesEnergia
-    fields = ['tarifa', 'desde', 'hasta', 'valor']
+    form_class = EscalonesEnergiaForm
+
+class ItemsAlta(CreateView):
+    template_name = "items/items_form.html"
+    model = Items
+    form_class = ItemsForm
+
+class ItemsModificar(UpdateView):
+    template_name = "items/items_form.html"
+    model = Items
+    form_class = ItemsForm
+
+class CespAlta(CreateView):
+    template_name = "cesp/cesp_form.html"
+    model = Cesp
+    form_class = CespForm
+
+class CespModificar(UpdateView):
+    template_name = "cesp/cesp_form.html"
+    model = Cesp
+    form_class = CespForm
+
+
+
