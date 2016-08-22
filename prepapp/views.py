@@ -4,8 +4,8 @@ from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 
-from prepapp.forms import SociosForm, TerrenosForm, TarifasForm, EscalonesEnergiaForm, ItemsForm, CespForm
-from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Items, Cesp
+from prepapp.forms import SociosForm
+from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia
 
 
 class SociosList(TemplateView):
@@ -13,8 +13,8 @@ class SociosList(TemplateView):
 
 class SociosAlta(CreateView):
     template_name = "socios/socios_form.html"
-    model = Socio
     form_class = SociosForm
+    model = Socio
 
 class SociosModificar(UpdateView):
     template_name = "socios/socios_form.html"

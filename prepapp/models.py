@@ -1,3 +1,4 @@
+# coding=utf-8
 from __future__ import unicode_literals
 
 from django.db import models
@@ -12,12 +13,12 @@ class Socio(models.Model):
                          (2, 'Seeber'),
                          (3, 'Col. Vignaud'))
 
-    nroSocio = models.IntegerField(primary_key=True)
-    razonSocial = models.CharField(max_length=140)
-    domicilio = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=15, blank=True)
+    nroSocio = models.PositiveIntegerField(primary_key=True, help_text="Número de socio.")
+    razonSocial = models.CharField(max_length=140, help_text="Razón social o nombre y apellido del usuario.")
+    domicilio = models.CharField(max_length=100, help_text="Domicilio principal del socio, luego cada terreno tendrá el suyo.")
+    telefono = models.CharField(max_length=15, blank=True, help_text="Teléfono de contacto. <b>Opcional.</b>")
     fechaCreacion = models.DateField(auto_now_add=True)
-    localidad = models.IntegerField(choices=LOCALIDAD_CHOICES)
+    localidad = models.IntegerField(choices=LOCALIDAD_CHOICES, default=1, help_text="Localidad de residencia del socio.")
     activo = models.BooleanField(default=True)
 
     def __unicode__(self):
