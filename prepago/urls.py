@@ -16,10 +16,11 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
-from prepapp.views import SociosList
+from prepapp.views import SociosList, SociosAlta
 
 sociosPatterns = [
-    url(r'list/$', SociosList.as_view(), name="SociosList")
+    url(r'list/$', SociosList.as_view(), name="SociosList"),
+    url(r'new/$', SociosAlta.as_view(), name="SociosAlta")
 ]
 
 urlpatterns = [
