@@ -43,16 +43,16 @@ class ChoiceFieldMDL(forms.ChoiceField):
         attrs.update({'style': 'width: 100%;'})
         return attrs
 
+
 def customize_field(field):
-    if isinstance(field, models.CharField):
-        return CharFieldMDL(max_length=field.max_length, help_text=field.help_text)
-    elif isinstance(field, models.PositiveIntegerField):
-        return IntegerFieldMDL(localize=False, help_text=field.help_text)
-    elif field.choices:
+    if field.choices:
         return ChoiceFieldMDL(choices=field.choices, label='', help_text=field.help_text)
+    elif isinstance(field, models.CharField):
+        return CharFieldMDL(max_length=field.max_length, help_text=field.help_text)
+    elif isinstance(field, models.PositiveIntegerField) or isinstance(field, models.IntegerField):
+        return IntegerFieldMDL(localize=False, help_text=field.help_text)
     else:
         return field.formfield()
-
 
 class MDLBaseModelForm(forms.ModelForm):
     def __getitem__(self, name):
@@ -78,7 +78,7 @@ class MDLBaseModelForm(forms.ModelForm):
                             <span class="individual_errors">%(errors)s</span>
                         </div>
                     </div>
-                    <div class="mdl-cell">
+                    <div class="mdl-cell--8-col">
                         %(help_text)s
                     </div>
                 </div>"""
@@ -97,16 +97,22 @@ class SociosForm(MDLBaseModelForm):
         fields = ['nroSocio', 'razonSocial', 'domicilio', 'localidad', 'telefono']
 
 class TerrenosForm(MDLBaseModelForm):
+    formfield_callback = customize_field
+
     class Meta:
         model = Terreno
         fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua', 'tarifa']
 
 class TarifasForm(MDLBaseModelForm):
+    formfield_callback = customize_field
+
     class Meta:
         model = Tarifa
         fields = ['nombre']
 
 class EscalonesEnergiaForm(MDLBaseModelForm):
+    formfield_callback = customize_field
+
     class Meta:
         model = EscalonesEnergia
         fields = ['tarifa', 'desde', 'hasta', 'valor']
@@ -117,6 +123,8 @@ class ItemsForm(MDLBaseModelForm):
         fields = ['nombre', 'tipo', 'aplicacion', 'valor']
 
 class CespForm(MDLBaseModelForm):
+    formfield_callback = customize_field
+
     class Meta:
         model = Cesp
         fields = ['nroCesp', 'fecha']

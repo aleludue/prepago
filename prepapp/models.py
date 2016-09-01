@@ -24,9 +24,6 @@ class Socio(models.Model):
     def __unicode__(self):
         return '%s - %s'%(self.nroSocio, self.razonSocial)
 
-    class Admin:
-        pass
-
 
 class Terreno(models.Model):
     CONDICION_IVA_CHOICES = (('RINS', 'Responsable Inscripto'),
@@ -35,20 +32,17 @@ class Terreno(models.Model):
                              ('EXEN', 'Exento'),
                              ('NOCA', 'No Categorizado'))
 
-    socio = models.ForeignKey(Socio)
-    nroTerreno = models.CharField(max_length=10)
-    domicilio = models.CharField(max_length=100)
-    condicionIva = models.CharField(max_length=4, choices=CONDICION_IVA_CHOICES)
-    nroMedidorEnergia = models.CharField(max_length=30)
-    activo = models.BooleanField(default=True)
-    cargoConsumoAgua = models.BooleanField(default=True)
-    tarifa = models.ForeignKey('Tarifa')
+    socio = models.ForeignKey(Socio, help_text="Socio propietario del terreno.", verbose_name="")
+    nroTerreno = models.CharField(max_length=10, help_text="Número de terreno.")
+    domicilio = models.CharField(max_length=100, help_text="Domicilio del terreno.")
+    condicionIva = models.CharField(max_length=4, choices=CONDICION_IVA_CHOICES, help_text="Condicion de iva del terreno.")
+    nroMedidorEnergia = models.CharField(max_length=30, help_text="Número de serie del medidor.")
+    activo = models.BooleanField(default=True, help_text="Estado del terreno.")
+    cargoConsumoAgua = models.BooleanField(default=True, help_text="Cargo por consumo de agua.")
+    tarifa = models.ForeignKey('Tarifa', help_text="Tarifa aplicada al terreno.", verbose_name="")
 
     def __unicode__(self):
         return self.nroTerreno
-
-    class Admin:
-        pass
 
 class RecambioMedidor(models.Model):
     terreno = models.ForeignKey(Terreno)
@@ -56,31 +50,23 @@ class RecambioMedidor(models.Model):
     nroMedidor = models.CharField(max_length=30)
 
     def __unicode__(self):
-        return '%s - %s' % (self.terreno, self.nroMedidor)
+        return '%s-%s' % (self.terreno, self.nroMedidor)
 
-    class Admin:
-        pass
 
 class Tarifa(models.Model):
-    nombre = models.CharField(max_length=30)
+    nombre = models.CharField(max_length=30, help_text="Nombre de la tarifa.")
 
     def __unicode__(self):
         return self.nombre
 
-    class Admin:
-        pass
-
 class EscalonesEnergia(models.Model):
-    tarifa = models.ForeignKey(Tarifa)
-    desde = models.IntegerField()
-    hasta = models.IntegerField()
-    valor = models.FloatField()
+    tarifa = models.ForeignKey(Tarifa, help_text="Tarifa a la que se aplicara el escalon energetico.")
+    desde = models.IntegerField(help_text="Valor base del escalon.")
+    hasta = models.IntegerField(help_text="Valor final del escalon.")
+    valor = models.FloatField(help_text="Costo en pesos de los intervalos ingresados en el escalon.")
 
     def __unicode__(self):
         return '%s - %s a %s' % (self.tarifa, self.desde, self.hasta)
-
-    class Admin:
-        pass
 
 class Items(models.Model):
     TIPOS_CHOICES = (('FIJ', 'Fijo'),
@@ -98,9 +84,6 @@ class Items(models.Model):
     def __unicode__(self):
         return self.nombre
 
-    class Admin:
-        pass
-
 class Gravamen(models.Model):
     IVA_CHOICES = (('IVA21', 'IVA 21%'),
                    ('IVA27', 'IVA 27%'),
@@ -112,8 +95,8 @@ class Gravamen(models.Model):
     iva = models.CharField(max_length=5, choices=IVA_CHOICES)
 
 class Cesp(models.Model):
-    nroCesp = models.CharField(primary_key=True, max_length=50)
-    fecha = models.DateField()
+    nroCesp = models.CharField(primary_key=True, max_length=50, help_text="Número de CESP.")
+    fecha = models.DateField(help_text="Fecha de validez del número CESP ingresado.")
 
     def __unicode__(self):
         return self.nroCesp
@@ -129,9 +112,6 @@ class Factura(models.Model):
 
     def __unicode__(self):
         return self.nroFactura
-
-    class Admin:
-        pass
 
 class Factura_Items(models.Model):
     nroFactura = models.ForeignKey(Factura)
