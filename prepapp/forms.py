@@ -1,6 +1,5 @@
 from django import forms
 from django.db import models
-from django.forms.fields import ChoiceField
 
 from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Items, Cesp
 
