@@ -13,13 +13,11 @@ from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Cesp, Items
 class SociosList(TemplateView):
     template_name = "socios/socios_list.html"
 
-
 class SociosAlta(CreateView):
     success_url = reverse_lazy("SociosList")
     template_name = "socios/socios_form.html"
     form_class = SociosForm
     model = Socio
-
 
 class SociosModificar(UpdateView):
     success_url = reverse_lazy('SociosList')
@@ -27,20 +25,17 @@ class SociosModificar(UpdateView):
     form_class = SociosForm
     model = Socio
 
-
 def sociosSuspender(request, pk):
     socio = Socio.objects.get(pk=pk)
     socio.activo = False
     socio.save()
     return HttpResponseRedirect(reverse_lazy('SociosList'))
 
-
 def sociosHabilitar(request, pk):
     socio = Socio.objects.get(pk=pk)
     socio.activo = True
     socio.save()
     return HttpResponseRedirect(reverse_lazy('SociosList'))
-
 
 class TerrenoList(TemplateView):
     template_name = "terrenos/terrenos_list.html"
@@ -70,7 +65,6 @@ def terrenosHabilitar(request, pk):
     terreno.save()
     return HttpResponseRedirect(reverse_lazy('TerrenosList'))
 
-
 class TarifaList(TemplateView):
     template_name = "tarifas/tarifas_list.html"
 
@@ -78,6 +72,7 @@ class TarifaAlta(CreateView):
     template_name = "tarifas/tarifas_form.html"
     model = Tarifa
     form_class = TarifasForm
+    success_url = reverse_lazy('TarifaList')
 
 class TarifaModificar(UpdateView):
     template_name = "tarifas/tarifas_form.html"
@@ -92,6 +87,7 @@ class EscalonesEnergiaAlta(CreateView):
     template_name = "escalonesenergia/escalonesenergia_form.html"
     model = EscalonesEnergia
     form_class = EscalonesEnergiaForm
+    success_url = reverse_lazy('EscalonesEnergiaList')
 
 class EscalonesEnergiaModificar(UpdateView):
     template_name = "escalonesenergia/escalonesenergia_form.html"
@@ -99,15 +95,33 @@ class EscalonesEnergiaModificar(UpdateView):
     form_class = EscalonesEnergiaForm
     success_url = reverse_lazy('EscalonesEnergiaList')
 
+class ItemsList(TemplateView):
+    template_name = "items/items_list.html"
+
 class ItemsAlta(CreateView):
     template_name = "items/items_form.html"
     model = Items
     form_class = ItemsForm
+    success_url = reverse_lazy('ItemsList')
 
 class ItemsModificar(UpdateView):
     template_name = "items/items_form.html"
     model = Items
     form_class = ItemsForm
+    success_url = reverse_lazy('ItemsList')
+
+def itemsSuspender(request, pk):
+    item = Items.objects.get(pk=pk)
+    item.activo = False
+    item.save()
+    return HttpResponseRedirect(reverse_lazy('ItemsList'))
+
+
+def itemsHabilitar(request, pk):
+    item = Items.objects.get(pk=pk)
+    item.activo = True
+    item.save()
+    return HttpResponseRedirect(reverse_lazy('ItemsList'))
 
 class CespList(TemplateView):
     template_name = "cesp/cesp_list.html"
@@ -116,6 +130,7 @@ class CespAlta(CreateView):
     template_name = "cesp/cesp_form.html"
     model = Cesp
     form_class = CespForm
+    success_url = reverse_lazy('CespList')
 
 class CespModificar(UpdateView):
     template_name = "cesp/cesp_form.html"

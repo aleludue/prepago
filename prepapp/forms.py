@@ -159,6 +159,8 @@ class EscalonesEnergiaForm(MDLBaseModelForm):
 
 
 class ItemsForm(MDLBaseModelForm):
+    formfield_callback = customize_field
+
     class Meta:
         model = Items
         fields = ['nombre', 'tipo', 'aplicacion', 'valor']

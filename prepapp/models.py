@@ -40,7 +40,7 @@ class Terreno(models.Model):
                              ('NOCA', 'No Categorizado'))
 
     socio = models.ForeignKey(Socio, help_text="Socio propietario del terreno.", verbose_name="")
-    nroTerreno = models.CharField(max_length=10, help_text="Número de terreno.")
+    nroTerreno = models.CharField(unique=True, max_length=10, help_text="Número de terreno.")
     domicilio = models.CharField(max_length=100, help_text="Domicilio del terreno.")
     condicionIva = models.CharField(max_length=4, choices=CONDICION_IVA_CHOICES,
                                     help_text="Condicion de iva del terreno.")
@@ -86,11 +86,12 @@ class Items(models.Model):
     APLICACION_CHOICES = (('CF', 'Cargo Fijo'),
                           ('EN', 'Energia'))
 
-    nombre = models.CharField(max_length=60)
-    tipo = models.CharField(max_length=3, choices=TIPOS_CHOICES)
-    aplicacion = models.CharField(max_length=2, choices=APLICACION_CHOICES)
-    valor = models.FloatField()
+    nombre = models.CharField(max_length=60, help_text="Nombre del item")
+    tipo = models.CharField(max_length=3, choices=TIPOS_CHOICES, help_text="Tipo de valor del item, porcentual o fijo")
+    aplicacion = models.CharField(max_length=2, choices=APLICACION_CHOICES, help_text="Área de aplicación del item")
+    valor = models.FloatField(help_text="Valor del item")
     tarifa = models.ManyToManyField(Tarifa, through='Gravamen')
+    activo = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.nombre
@@ -108,7 +109,7 @@ class Gravamen(models.Model):
 
 
 class Cesp(models.Model):
-    nroCesp = models.CharField(primary_key=True, max_length=50, help_text="Número de CESP.")
+    nroCesp = models.CharField(unique=True, max_length=50, help_text="Número de CESP.")
     fecha = models.DateField(help_text="Fecha de validez del número CESP ingresado.")
 
     def __unicode__(self):
@@ -116,7 +117,7 @@ class Cesp(models.Model):
 
 
 class Factura(models.Model):
-    nroFactura = models.CharField(max_length=50, primary_key=True)
+    nroFactura = models.CharField(max_length=50, unique=True)
     fecha = models.DateField(auto_now_add=True)
     nroTerreno = models.ForeignKey(Terreno)
     importe = models.FloatField()

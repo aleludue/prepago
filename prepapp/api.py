@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse
 
-from prepapp.models import Socio, Terreno
+from prepapp.models import Socio, Terreno, Items, Cesp
 
 
 def get_socios_fk(request):
@@ -207,6 +207,87 @@ def get_terrenos_table(request):
 
     # extract information
     data = make_data(objects, list_display, "TerrenosModificar", "TerrenosSuspender", "TerrenosHabilitar")
+    # define response
+    response = {
+        'data': data,
+        'recordsTotal': recordsTotal,
+        'recordsFiltered': recordsFiltered,
+        'draw': request.GET['draw']
+    }
+
+    # serialize to json
+    s = StringIO()
+    json.dump(response, s)
+    s.seek(0)
+    return HttpResponse(s.read())
+
+
+def get_items_table(request):
+    # SETEOS INICIALES
+    objects = Items.objects.all()
+    list_display = ['nombre', 'tipo', 'aplicacion', 'valor']
+    list_global_search = ['nombre']
+    data_struct = {0: 'nombre', 1: 'tipo', 2: 'aplicacion', 3: 'valor'}
+
+    # Cuenta total de articulos:
+    recordsTotal = objects.count()
+
+    # Filtrado de los bancos
+    objects = filtering(request.GET, objects, data_struct, list_global_search)
+
+    # Ordenado
+    objects = ordering(request.GET, objects, data_struct)
+
+    # Conteo de articulos despues dle filtrado
+    recordsFiltered = objects.count()
+
+    # finally, slice according to length sent by dataTables:
+    start = int(request.GET['start'])
+    length = int(request.GET['length'])
+    objects = objects[start: (start + length)]
+
+    # extract information
+    data = make_data(objects, list_display, "ItemsModificar", "ItemsSuspender", "ItemsHabilitar")
+    # define response
+    response = {
+        'data': data,
+        'recordsTotal': recordsTotal,
+        'recordsFiltered': recordsFiltered,
+        'draw': request.GET['draw']
+    }
+
+    # serialize to json
+    s = StringIO()
+    json.dump(response, s)
+    s.seek(0)
+    return HttpResponse(s.read())
+
+def get_cesp_table(request):
+    # SETEOS INICIALES
+    objects = Cesp.objects.all()
+    list_display = ['nroCesp', 'fecha']
+    list_global_search = list_display
+    data_struct = {0: 'nroCesp', 1: 'fecha'}
+
+    # Cuenta total de articulos:
+    recordsTotal = objects.count()
+
+    # Filtrado de los bancos
+    objects = filtering(request.GET, objects, data_struct, list_global_search)
+
+    # Ordenado
+    objects = ordering(request.GET, objects, data_struct)
+
+    # Conteo de articulos despues dle filtrado
+    recordsFiltered = objects.count()
+
+    # finally, slice according to length sent by dataTables:
+    start = int(request.GET['start'])
+    length = int(request.GET['length'])
+    objects = objects[start: (start + length)]
+
+    # extract information
+    data = make_data(objects, list_display, "CespModificar")
     # define response
     response = {
         'data': data,
