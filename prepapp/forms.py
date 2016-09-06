@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from django.forms.fields import ChoiceField
+from django.forms import widgets
 
 from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Items, Cesp
 
@@ -17,6 +17,33 @@ def charfield_handler(field):
         attrs.update({'data-validation': 'required'})
     return attrs
 
+
+#####   WIDGET's    #####
+
+class AutoCompleteFKMultiWidget(widgets.MultiWidget):
+    dict_pk_search = {}
+
+    def __init__(self, attrs=None):
+        _widgets = (
+            widgets.TextInput(attrs={'class': 'mdl-textfield__input'}), widgets.HiddenInput())
+        super(AutoCompleteFKMultiWidget, self).__init__(_widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            obj = self.choices.queryset.model.objects.get(pk=value)
+            return [getattr(obj, self.dict_pk_search[self.choices.queryset.model]), obj.pk]
+        else:
+            return [None, None]
+
+    def value_from_datadict(self, data, files, name):
+        values = super(AutoCompleteFKMultiWidget, self).value_from_datadict(data, files, name)
+        try:
+            return int(values[1])
+        except ValueError:
+            return None
+
+
+#####   FIELD's     #####
 
 class BoundFieldMDL(forms.forms.BoundField):
     def label_tag(self, contents=None, attrs={'class': 'mdl-textfield__label'}, label_suffix=None):
@@ -44,6 +71,10 @@ class ChoiceFieldMDL(forms.ChoiceField):
         return attrs
 
 
+class AutoCompleteMDLFKField(forms.ModelChoiceField):
+    widget = AutoCompleteFKMultiWidget
+
+
 def customize_field(field):
     if field.choices:
         return ChoiceFieldMDL(choices=field.choices, label='', help_text=field.help_text)
@@ -51,8 +82,11 @@ def customize_field(field):
         return CharFieldMDL(max_length=field.max_length, help_text=field.help_text)
     elif isinstance(field, models.PositiveIntegerField) or isinstance(field, models.IntegerField):
         return IntegerFieldMDL(localize=False, help_text=field.help_text)
+    elif isinstance(field, models.ForeignKey):
+        return AutoCompleteMDLFKField(queryset=field.rel.to.objects.all())
     else:
         return field.formfield()
+
 
 class MDLBaseModelForm(forms.ModelForm):
     def __getitem__(self, name):
@@ -86,8 +120,9 @@ class MDLBaseModelForm(forms.ModelForm):
             normal_row=line,
             error_row='<div class="form_errors">%s</div>',
             row_ender='</p>',
-            help_text_html='<p class="help-text">%s</p>',
+            help_text_html='<p class="mdl-textfield mdl-js-textfield">%s</p>',
             errors_on_separate_row=False)
+
 
 class SociosForm(MDLBaseModelForm):
     formfield_callback = customize_field
@@ -96,12 +131,16 @@ class SociosForm(MDLBaseModelForm):
         model = Socio
         fields = ['nroSocio', 'razonSocial', 'domicilio', 'localidad', 'telefono']
 
+
 class TerrenosForm(MDLBaseModelForm):
     formfield_callback = customize_field
 
     class Meta:
         model = Terreno
         fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua', 'tarifa']
+        # Para Campo FK personalizado con AutoComplete, se usa en UpdateView, debe devolver lo mismo que en la vista api del AC
+        pk_socios_fields = ['nombre']
+
 
 class TarifasForm(MDLBaseModelForm):
     formfield_callback = customize_field
@@ -110,6 +149,7 @@ class TarifasForm(MDLBaseModelForm):
         model = Tarifa
         fields = ['nombre']
 
+
 class EscalonesEnergiaForm(MDLBaseModelForm):
     formfield_callback = customize_field
 
@@ -117,10 +157,12 @@ class EscalonesEnergiaForm(MDLBaseModelForm):
         model = EscalonesEnergia
         fields = ['tarifa', 'desde', 'hasta', 'valor']
 
+
 class ItemsForm(MDLBaseModelForm):
     class Meta:
         model = Items
         fields = ['nombre', 'tipo', 'aplicacion', 'valor']
+
 
 class CespForm(MDLBaseModelForm):
     formfield_callback = customize_field

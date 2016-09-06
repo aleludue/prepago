@@ -15,21 +15,31 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 
+from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table
 from prepapp.views import SociosList, SociosAlta, SociosModificar, TerrenoList, TerrenoAlta, TerrenoModificar, \
     TarifaList, TarifaAlta, TarifaModificar, CespList, CespAlta, CespModificar, EscalonesEnergiaList, \
-    EscalonesEnergiaAlta, EscalonesEnergiaModificar
+    EscalonesEnergiaAlta, EscalonesEnergiaModificar, sociosSuspender, sociosHabilitar, terrenosSuspender, \
+    terrenosHabilitar
 
 sociosPatterns = [
     url(r'list/$', SociosList.as_view(), name="SociosList"),
     url(r'new/$', SociosAlta.as_view(), name="SociosAlta"),
-    url(r'update/(?P<pk>\d+)$', SociosModificar.as_view(), name="SociosModificar")
+    url(r'update/(?P<pk>\d+)$', SociosModificar.as_view(), name="SociosModificar"),
+    url(r'suspender/(?P<pk>\d+)$', sociosSuspender, name='SociosSuspender'),
+    url(r'habilitar/(?P<pk>\d+)$', sociosHabilitar, name='SociosHabilitar'),
+    url(r'get_socios_table/$', get_socios_table, name='get_socios_table'),
+    url(r'get_socios_fk/$', get_socios_fk, name='get_socios_fk'),
 ]
 
 terrenosPatterns = [
     url(r'list/$', TerrenoList.as_view(), name="TerrenosList"),
     url(r'new/$', TerrenoAlta.as_view(), name="TerrenosAlta"),
-    url(r'update/(?P<pk>\d+)$', TerrenoModificar.as_view(), name="TerrenosModificar")
+    url(r'update/(?P<pk>\d+)$', TerrenoModificar.as_view(), name="TerrenosModificar"),
+    url(r'suspender/(?P<pk>\d+)$', terrenosSuspender, name='TerrenosSuspender'),
+    url(r'habilitar/(?P<pk>\d+)$', terrenosHabilitar, name='TerrenosHabilitar'),
+    url(r'get_terrenos_table/$', get_terrenos_table, name='get_terrenos_table'),
 ]
 
 tarifasPatterns = [
