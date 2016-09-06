@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse_lazy
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 
 # Create your views here.
@@ -12,10 +13,13 @@ from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Cesp, Items
 class SociosList(TemplateView):
     template_name = "socios/socios_list.html"
 
+
 class SociosAlta(CreateView):
+    success_url = reverse_lazy("SociosList")
     template_name = "socios/socios_form.html"
     form_class = SociosForm
     model = Socio
+
 
 class SociosModificar(UpdateView):
     success_url = reverse_lazy('SociosList')
@@ -23,10 +27,26 @@ class SociosModificar(UpdateView):
     form_class = SociosForm
     model = Socio
 
+
+def sociosSuspender(request, pk):
+    socio = Socio.objects.get(pk=pk)
+    socio.activo = False
+    socio.save()
+    return HttpResponseRedirect(reverse_lazy('SociosList'))
+
+
+def sociosHabilitar(request, pk):
+    socio = Socio.objects.get(pk=pk)
+    socio.activo = True
+    socio.save()
+    return HttpResponseRedirect(reverse_lazy('SociosList'))
+
+
 class TerrenoList(TemplateView):
     template_name = "terrenos/terrenos_list.html"
 
 class TerrenoAlta(CreateView):
+    success_url = reverse_lazy("TerrenosList")
     template_name = "terrenos/terrenos_form.html"
     model = Terreno
     form_class = TerrenosForm
@@ -36,6 +56,20 @@ class TerrenoModificar(UpdateView):
     template_name = "terrenos/terrenos_form.html"
     model = Terreno
     form_class = TerrenosForm
+
+def terrenosSuspender(request, pk):
+    terreno = Terreno.objects.get(pk=pk)
+    terreno.activo = False
+    terreno.save()
+    return HttpResponseRedirect(reverse_lazy('TerrenosList'))
+
+
+def terrenosHabilitar(request, pk):
+    terreno = Terreno.objects.get(pk=pk)
+    terreno.activo = True
+    terreno.save()
+    return HttpResponseRedirect(reverse_lazy('TerrenosList'))
+
 
 class TarifaList(TemplateView):
     template_name = "tarifas/tarifas_list.html"
