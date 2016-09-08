@@ -259,21 +259,43 @@ class EscalonesEnergiaList(TemplateView):
 #     model = Escalones
 #     form_class = EscalonesEnergiaForm
 
-# class EscalonesEnergiaModificar(UpdateView):
-#     template_name = "escalonesenergia/escalonesenergia_form.html"
-#     model = Escalones
-#     form_class = EscalonesEnergiaForm
-#     success_url = reverse_lazy('EscalonesEnergiaList')
+class EscalonesEnergiaModificar(UpdateView):
+    template_name = "escalonesenergia/escalonesenergia_form.html"
+    model = EscalonesEnergia
+    form_class = EscalonesEnergiaForm
+    success_url = reverse_lazy('EscalonesEnergiaList')
 
 # class ItemsAlta(CreateView):
 #     template_name = "items/items_form.html"
 #     model = Items
 #     form_class = ItemsForm
+class ItemsList(TemplateView):
+    template_name = "items/items_list.html"
 
-# class ItemsModificar(UpdateView):
-#     template_name = "items/items_form.html"
-#     model = Items
-#     form_class = ItemsForm
+class ItemsAlta(CreateView):
+    template_name = "items/items_form.html"
+    model = Items
+    form_class = ItemsForm
+    success_url = reverse_lazy('ItemsList')
+
+class ItemsModificar(UpdateView):
+    template_name = "items/items_form.html"
+    model = Items
+    form_class = ItemsForm
+    success_url = reverse_lazy('ItemsList')
+
+def itemsSuspender(request, pk):
+    item = Items.objects.get(pk=pk)
+    item.activo = False
+    item.save()
+    return HttpResponseRedirect(reverse_lazy('ItemsList'))
+
+
+def itemsHabilitar(request, pk):
+    item = Items.objects.get(pk=pk)
+    item.activo = True
+    item.save()
+    return HttpResponseRedirect(reverse_lazy('ItemsList'))
 
 class CespList(TemplateView):
     template_name = "cesp/cesp_list.html"
@@ -282,6 +304,7 @@ class CespAlta(CreateView):
     template_name = "cesp/cesp_form.html"
     model = Cesp
     form_class = CespForm
+    success_url = reverse_lazy('CespList')
 
 class CespModificar(UpdateView):
     template_name = "cesp/cesp_form.html"

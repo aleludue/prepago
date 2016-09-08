@@ -16,6 +16,12 @@
     <link rel="stylesheet" href="{% static "datatable-mdl-custom.css" %}">
 {% endblock %}
 
+{% block appbar_actions %}
+    <a class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--accent" href="{% url "SociosAlta" %}">
+        <i class="material-icons">add</i>
+    </a>
+{% endblock %}
+
 {% block pageContent %}
     <table id="socios" class="mdl-data-table" cellspacing="0" width="100%">
         <thead>

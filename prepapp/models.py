@@ -40,7 +40,7 @@ class Terreno(models.Model):
                              ('NOCA', 'No Categorizado'))
 
     socio = models.ForeignKey(Socio, help_text="Socio propietario del terreno.", verbose_name="")
-    nroTerreno = models.CharField(max_length=10, help_text="Número de terreno.")
+    nroTerreno = models.CharField(unique=True, max_length=10, help_text="Número de terreno.")
     domicilio = models.CharField(max_length=100, help_text="Domicilio del terreno.")
     condicionIva = models.CharField(max_length=4, choices=CONDICION_IVA_CHOICES,
                                     help_text="Condicion de iva del terreno.")
@@ -113,7 +113,7 @@ class Escalones(models.Model):
         return '%s - %s a %s' % (self.item, self.desde, self.hasta)
 
 class Cesp(models.Model):
-    nroCesp = models.CharField(primary_key=True, max_length=50, help_text="Número de CESP.")
+    nroCesp = models.CharField(unique=True, max_length=50, help_text="Número de CESP.")
     fecha = models.DateField(help_text="Fecha de validez del número CESP ingresado.")
 
     def __unicode__(self):
@@ -121,7 +121,7 @@ class Cesp(models.Model):
 
 
 class Factura(models.Model):
-    nroFactura = models.CharField(max_length=50, primary_key=True)
+    nroFactura = models.CharField(max_length=50, unique=True)
     fecha = models.DateField(auto_now_add=True)
     nroTerreno = models.ForeignKey(Terreno)
     importe = models.FloatField()

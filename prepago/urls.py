@@ -17,9 +17,11 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
-from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table
+from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table, get_items_table, get_cesp_table
 from prepapp.views import SociosList, SociosAlta, SociosModificar, TerrenoList, TerrenoAlta, TerrenoModificar, \
     TarifaList, TarifaAlta, TarifaModificar, CespList, CespAlta, CespModificar, EscalonesEnergiaList, \
+    EscalonesEnergiaAlta, EscalonesEnergiaModificar, sociosSuspender, sociosHabilitar, terrenosSuspender, \
+    terrenosHabilitar, ItemsList, ItemsAlta, ItemsModificar, itemsSuspender, itemsHabilitar
     sociosSuspender, sociosHabilitar, terrenosSuspender, \
     terrenosHabilitar, tarifaConfiguracion
 
@@ -44,14 +46,15 @@ terrenosPatterns = [
 
 tarifasPatterns = [
     url(r'list/$', TarifaList.as_view(), name="TarifasList"),
-    url(r'new/$', tarifaConfiguracion, name="TarifasAlta"),
+    url(r'new/$', TarifaAlta.as_view(), name="TarifasAlta"),
     url(r'update/(?P<pk>\d+)$', TarifaModificar.as_view(), name="TarifasModificar")
 ]
 
 cespPatterns = [
     url(r'list/$', CespList.as_view(), name="CespList"),
     url(r'new/$', CespAlta.as_view(), name="CespAlta"),
-    url(r'update/(?P<pk>\d+)$', CespModificar.as_view(), name="CespModificar")
+    url(r'update/(?P<pk>\d+)$', CespModificar.as_view(), name="CespModificar"),
+    url(r'get_cesp_table/$', get_cesp_table, name='get_cesp_table'),
 ]
 
 # escalonesEnergiaPatterns = [
@@ -60,6 +63,15 @@ cespPatterns = [
 #     url(r'update/(?P<pk>\d+)$', EscalonesEnergiaModificar.as_view(), name="EscalonesEnergiaModificar")
 # ]
 
+itemsPatterns = [
+    url(r'list/$', ItemsList.as_view(), name="ItemsList"),
+    url(r'new/$', ItemsAlta.as_view(), name="ItemsAlta"),
+    url(r'update/(?P<pk>\d+)$', ItemsModificar.as_view(), name="ItemsModificar"),
+    url(r'get_items_table/$', get_items_table, name='get_items_table'),
+    url(r'suspender/(?P<pk>\d+)$', itemsSuspender, name='ItemsSuspender'),
+    url(r'habilitar/(?P<pk>\d+)$', itemsHabilitar, name='ItemsHabilitar'),
+]
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^socios/', include(sociosPatterns)),
@@ -67,4 +79,6 @@ urlpatterns = [
     url(r'^tarifas/', include(tarifasPatterns)),
     url(r'^cesp/', include(cespPatterns)),
     # url(r'^escalones/', include(escalonesEnergiaPatterns))
+    url(r'^escalones/', include(escalonesEnergiaPatterns)),
+    url(r'^items/', include(itemsPatterns))
 ]
