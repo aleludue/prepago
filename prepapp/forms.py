@@ -1,8 +1,9 @@
 from django import forms
 from django.db import models
 from django.forms import widgets
+from django.forms.fields import CharField
 
-from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Items, Cesp
+from prepapp.models import Socio, Terreno, Tarifa, Escalones, Items, Cesp, AsociacionItemAgrupacion
 
 
 def charfield_handler(field):
@@ -137,31 +138,46 @@ class TerrenosForm(MDLBaseModelForm):
 
     class Meta:
         model = Terreno
-        fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua', 'tarifa']
-        # Para Campo FK personalizado con AutoComplete, se usa en UpdateView, debe devolver lo mismo que en la vista api del AC
-        pk_socios_fields = ['nombre']
+        fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua']
 
 
-class TarifasForm(MDLBaseModelForm):
+class TarifaForm(MDLBaseModelForm):
     formfield_callback = customize_field
 
     class Meta:
         model = Tarifa
         fields = ['nombre']
 
-
-class EscalonesEnergiaForm(MDLBaseModelForm):
-    formfield_callback = customize_field
-
-    class Meta:
-        model = EscalonesEnergia
-        fields = ['tarifa', 'desde', 'hasta', 'valor']
+class EscalasForm(forms.Form):
+    desde = forms.IntegerField()
+    hasta = forms.IntegerField()
 
 
-class ItemsForm(MDLBaseModelForm):
-    class Meta:
-        model = Items
-        fields = ['nombre', 'tipo', 'aplicacion', 'valor']
+class ItemsEnergiaForm(forms.Form):
+    item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='EN'), widget=AutoCompleteFKMultiWidget())
+    iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES)
+    valor = forms.DecimalField(max_digits=5)
+    escala = forms.IntegerField(widget=forms.HiddenInput())
+
+
+class ItemsFijoForm(forms.Form):
+    item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='CF'), widget=AutoCompleteFKMultiWidget())
+    iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES)
+    valor = forms.DecimalField(max_digits=5)
+    escala = forms.IntegerField(widget=forms.HiddenInput())
+
+
+class EscalonesForm(forms.Form):
+    item = forms.IntegerField(widget=forms.HiddenInput())
+    desde = forms.IntegerField()
+    hasta = forms.IntegerField()
+    valor = forms.DecimalField(decimal_places=5)
+
+
+# class ItemsForm(MDLBaseModelForm):
+#     class Meta:
+#         model = Items
+#         fields = ['nombre', 'tipo', 'aplicacion', 'valor']
 
 
 class CespForm(MDLBaseModelForm):

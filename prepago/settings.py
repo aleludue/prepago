@@ -77,7 +77,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'energia_prepaga',
         'USER': 'energia_prepaga',
-        'PASSWORD': 'pr3p4g4',
+        'PASSWORD': 'prepaga',
         'HOST': '192.168.1.2',
         'PORT': '3306',
     }

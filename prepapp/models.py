@@ -65,23 +65,20 @@ class RecambioMedidor(models.Model):
 class Tarifa(models.Model):
     nombre = models.CharField(max_length=30, help_text="Nombre de la tarifa.")
 
+
     def __unicode__(self):
         return self.nombre
 
-
-class EscalonesEnergia(models.Model):
-    tarifa = models.ForeignKey(Tarifa, help_text="Tarifa a la que se aplicara el escalon energetico.")
-    desde = models.IntegerField(help_text="Valor base del escalon.")
-    hasta = models.IntegerField(help_text="Valor final del escalon.")
-    valor = models.FloatField(help_text="Costo en pesos de los intervalos ingresados en el escalon.")
-
-    def __unicode__(self):
-        return '%s - %s a %s' % (self.tarifa, self.desde, self.hasta)
+class AgrupacionDeItems(models.Model):
+    tarifa = models.ForeignKey(Tarifa, help_text="Tarifa asociada a esta agrupacion")
+    desde = models.IntegerField()
+    hasta = models.IntegerField()
 
 
 class Items(models.Model):
     TIPOS_CHOICES = (('FIJ', 'Fijo'),
-                     ('VAR', 'Variable'))
+                     ('VAR', 'Variable'),
+                     ('ESC', 'Escalonado'))
 
     APLICACION_CHOICES = (('CF', 'Cargo Fijo'),
                           ('EN', 'Energia'))
@@ -89,23 +86,31 @@ class Items(models.Model):
     nombre = models.CharField(max_length=60)
     tipo = models.CharField(max_length=3, choices=TIPOS_CHOICES)
     aplicacion = models.CharField(max_length=2, choices=APLICACION_CHOICES)
-    valor = models.FloatField()
-    tarifa = models.ManyToManyField(Tarifa, through='Gravamen')
+    # valor = models.FloatField()
+    tarifa = models.ManyToManyField(AgrupacionDeItems, through='AsociacionItemAgrupacion')
 
     def __unicode__(self):
         return self.nombre
 
-
-class Gravamen(models.Model):
+class AsociacionItemAgrupacion(models.Model):
     IVA_CHOICES = (('IVA21', 'IVA 21%'),
                    ('IVA27', 'IVA 27%'),
                    ('NOGRA', 'No Gravado'),
                    ('EXENT', 'Exento'))
 
-    tarifa = models.ForeignKey(Tarifa)
+    agrupacion = models.ForeignKey(AgrupacionDeItems)
     item = models.ForeignKey(Items)
     iva = models.CharField(max_length=5, choices=IVA_CHOICES)
+    valor = models.DecimalField(max_digits=10, decimal_places=5)
 
+class Escalones(models.Model):
+    asociacion = models.ForeignKey(AsociacionItemAgrupacion, help_text="Asociacion a la que se aplicara el escalon.")
+    desde = models.IntegerField(help_text="Valor base del escalon.")
+    hasta = models.IntegerField(help_text="Valor final del escalon.")
+    valor = models.FloatField(help_text="Costo en pesos de los intervalos ingresados en el escalon.")
+
+    def __unicode__(self):
+        return '%s - %s a %s' % (self.item, self.desde, self.hasta)
 
 class Cesp(models.Model):
     nroCesp = models.CharField(primary_key=True, max_length=50, help_text="Número de CESP.")

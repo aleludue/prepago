@@ -20,8 +20,8 @@ from django.contrib.auth.decorators import login_required
 from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table
 from prepapp.views import SociosList, SociosAlta, SociosModificar, TerrenoList, TerrenoAlta, TerrenoModificar, \
     TarifaList, TarifaAlta, TarifaModificar, CespList, CespAlta, CespModificar, EscalonesEnergiaList, \
-    EscalonesEnergiaAlta, EscalonesEnergiaModificar, sociosSuspender, sociosHabilitar, terrenosSuspender, \
-    terrenosHabilitar
+    sociosSuspender, sociosHabilitar, terrenosSuspender, \
+    terrenosHabilitar, tarifaConfiguracion
 
 sociosPatterns = [
     url(r'list/$', SociosList.as_view(), name="SociosList"),
@@ -44,7 +44,7 @@ terrenosPatterns = [
 
 tarifasPatterns = [
     url(r'list/$', TarifaList.as_view(), name="TarifasList"),
-    url(r'new/$', TarifaAlta.as_view(), name="TarifasAlta"),
+    url(r'new/$', tarifaConfiguracion, name="TarifasAlta"),
     url(r'update/(?P<pk>\d+)$', TarifaModificar.as_view(), name="TarifasModificar")
 ]
 
@@ -54,11 +54,11 @@ cespPatterns = [
     url(r'update/(?P<pk>\d+)$', CespModificar.as_view(), name="CespModificar")
 ]
 
-escalonesEnergiaPatterns = [
-    url(r'list/$', EscalonesEnergiaList.as_view(), name="EscalonesEnergiaList"),
-    url(r'new/$', EscalonesEnergiaAlta.as_view(), name="EscalonesEnergiaAlta"),
-    url(r'update/(?P<pk>\d+)$', EscalonesEnergiaModificar.as_view(), name="EscalonesEnergiaModificar")
-]
+# escalonesEnergiaPatterns = [
+#     url(r'list/$', EscalonesEnergiaList.as_view(), name="EscalonesEnergiaList"),
+#     url(r'new/$', EscalonesEnergiaAlta.as_view(), name="EscalonesEnergiaAlta"),
+#     url(r'update/(?P<pk>\d+)$', EscalonesEnergiaModificar.as_view(), name="EscalonesEnergiaModificar")
+# ]
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -66,5 +66,5 @@ urlpatterns = [
     url(r'^terrenos/', include(terrenosPatterns)),
     url(r'^tarifas/', include(tarifasPatterns)),
     url(r'^cesp/', include(cespPatterns)),
-    url(r'^escalones/', include(escalonesEnergiaPatterns))
+    # url(r'^escalones/', include(escalonesEnergiaPatterns))
 ]
