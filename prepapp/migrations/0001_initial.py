@@ -31,7 +31,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Cesp',
             fields=[
-                ('nroCesp', models.CharField(help_text='N\xfamero de CESP.', max_length=50, serialize=False, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('nroCesp', models.CharField(help_text='N\xfamero de CESP.', unique=True, max_length=50)),
                 ('fecha', models.DateField(help_text='Fecha de validez del n\xfamero CESP ingresado.')),
             ],
         ),
@@ -48,7 +49,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Factura',
             fields=[
-                ('nroFactura', models.CharField(max_length=50, serialize=False, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('nroFactura', models.CharField(unique=True, max_length=50)),
                 ('fecha', models.DateField(auto_now_add=True)),
                 ('importe', models.FloatField()),
                 ('cesp', models.ForeignKey(to='prepapp.Cesp')),
@@ -67,6 +69,10 @@ class Migration(migrations.Migration):
                 ('nombre', models.CharField(max_length=60)),
                 ('tipo', models.CharField(max_length=3, choices=[('FIJ', 'Fijo'), ('VAR', 'Variable'), ('ESC', 'Escalonado')])),
                 ('aplicacion', models.CharField(max_length=2, choices=[('CF', 'Cargo Fijo'), ('EN', 'Energia')])),
+                ('servicios', models.CharField(max_length=4, choices=[('ENER', 'Energia El\xe9ctrica'), ('AGUA', 'Agua Corriente'), ('CLOA', 'Cloacas'), ('SERV', 'Servicios Sociales'), ('ACUE', 'A cuenta de terceros')])),
+                ('activo', models.BooleanField(default=True)),
+                ('base', models.BooleanField(default=False)),
+                ('requerido', models.BooleanField(default=False)),
                 ('tarifa', models.ManyToManyField(to='prepapp.AgrupacionDeItems', through='prepapp.AsociacionItemAgrupacion')),
             ],
         ),
@@ -102,7 +108,7 @@ class Migration(migrations.Migration):
             name='Terreno',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('nroTerreno', models.CharField(help_text='N\xfamero de terreno.', max_length=10)),
+                ('nroTerreno', models.CharField(help_text='N\xfamero de terreno.', unique=True, max_length=10)),
                 ('domicilio', models.CharField(help_text='Domicilio del terreno.', max_length=100)),
                 ('condicionIva', models.CharField(help_text='Condicion de iva del terreno.', max_length=4, choices=[('RINS', 'Responsable Inscripto'), ('MONO', 'Monotributo'), ('CFIN', 'Consumidor Final'), ('EXEN', 'Exento'), ('NOCA', 'No Categorizado')])),
                 ('nroMedidorEnergia', models.CharField(help_text='N\xfamero de serie del medidor.', max_length=30)),

@@ -9,6 +9,7 @@ from django.utils import timezone
 
 class Socio(models.Model):
     fk_fields = ('nroSocio', 'razonSocial')
+
     LOCALIDAD_CHOICES = ((1, 'Brinkmann'),
                          (2, 'Seeber'),
                          (3, 'Col. Vignaud'))
@@ -74,8 +75,8 @@ class AgrupacionDeItems(models.Model):
     desde = models.IntegerField()
     hasta = models.IntegerField()
 
-
 class Items(models.Model):
+    fk_fields = ('nombre',)
     TIPOS_CHOICES = (('FIJ', 'Fijo'),
                      ('VAR', 'Variable'),
                      ('ESC', 'Escalonado'))
@@ -83,11 +84,20 @@ class Items(models.Model):
     APLICACION_CHOICES = (('CF', 'Cargo Fijo'),
                           ('EN', 'Energia'))
 
+    SERVICIOS = (('ENER', 'Energia Eléctrica'),
+                 ('AGUA', 'Agua Corriente'),
+                 ('CLOA', 'Cloacas'),
+                 ('SERV', 'Servicios Sociales'),
+                 ('ACUE', 'A cuenta de terceros'))
+
     nombre = models.CharField(max_length=60)
     tipo = models.CharField(max_length=3, choices=TIPOS_CHOICES)
     aplicacion = models.CharField(max_length=2, choices=APLICACION_CHOICES)
-    # valor = models.FloatField()
     tarifa = models.ManyToManyField(AgrupacionDeItems, through='AsociacionItemAgrupacion')
+    servicios = models.CharField(max_length=4, choices=SERVICIOS)
+    activo = models.BooleanField(default=True)
+    base = models.BooleanField(default=False)
+    requerido = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.nombre

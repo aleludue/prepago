@@ -8,7 +8,8 @@ from django.template.context_processors import csrf
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 
-from prepapp.forms import SociosForm, TerrenosForm, TarifaForm, CespForm, EscalasForm, ItemsFijoForm, ItemsEnergiaForm
+from prepapp.forms import SociosForm, TerrenosForm, TarifaForm, CespForm, EscalasForm, ItemsFijoForm, ItemsEnergiaForm, \
+    ItemsForm
 from prepapp.models import Socio, Terreno, Tarifa, Escalones, Cesp, Items
 
 
@@ -215,11 +216,16 @@ def tarifaConfiguracion(request):
         tarifaForm = TarifaForm()
         EscalasFormset = formset_factory(EscalasForm, extra=1)
         escalasFormset = EscalasFormset(prefix='escala')
-        todos_cf = Items.objects.filter(tipo='CF')
-        ItemsFijos = formset_factory(ItemsFijoForm, extra=1)
-        itemsFijos = ItemsFijos(prefix='fijos-0')
-        ItemsEnergia = formset_factory(ItemsEnergiaForm, extra=1)
-        itemsEnergia = ItemsEnergia(prefix='energia-0')
+        ItemsFijos = formset_factory(ItemsFijoForm, extra=0)
+        req_fijos = Items.objects.filter(requerido=True, aplicacion='CF')
+        initial_req_fijos = [{'item': req} for req in req_fijos]
+        print initial_req_fijos
+        itemsFijos = ItemsFijos(prefix='fijos-0', initial=initial_req_fijos)
+        ItemsEnergia = formset_factory(ItemsEnergiaForm, extra=0)
+        req_energia = Items.objects.filter(requerido=True, aplicacion='EN')
+        initial_req_energia = [{'item': req} for req in req_energia]
+        print initial_req_energia
+        itemsEnergia = ItemsEnergia(prefix='energia-0', initial=initial_req_energia)
         #detalleFormset = NuevoDetalleFormset(prefix='det_venta')
         #detalleFormset = iNuevoDetalleFormset(prefix='det_venta')
         #articuloCompuestoFormset = NuevoArticuloCompuestoFormset(prefix='art_comp')
@@ -251,24 +257,11 @@ class TarifaModificar(UpdateView):
     form_class = TarifaForm
     success_url = reverse_lazy('TarifaList')
 
-class EscalonesEnergiaList(TemplateView):
-    template_name = "escalonesenergia/escalonesenergia_list.html"
+class ItemsAlta(CreateView):
+    template_name = "items/items_form.html"
+    model = Items
+    form_class = ItemsForm
 
-# class EscalonesEnergiaAlta(CreateView):
-#     template_name = "escalonesenergia/escalonesenergia_form.html"
-#     model = Escalones
-#     form_class = EscalonesEnergiaForm
-
-class EscalonesEnergiaModificar(UpdateView):
-    template_name = "escalonesenergia/escalonesenergia_form.html"
-    model = EscalonesEnergia
-    form_class = EscalonesEnergiaForm
-    success_url = reverse_lazy('EscalonesEnergiaList')
-
-# class ItemsAlta(CreateView):
-#     template_name = "items/items_form.html"
-#     model = Items
-#     form_class = ItemsForm
 class ItemsList(TemplateView):
     template_name = "items/items_list.html"
 

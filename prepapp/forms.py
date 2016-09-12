@@ -32,7 +32,7 @@ class AutoCompleteFKMultiWidget(widgets.MultiWidget):
     def decompress(self, value):
         if value:
             obj = self.choices.queryset.model.objects.get(pk=value)
-            return [getattr(obj, self.dict_pk_search[self.choices.queryset.model]), obj.pk]
+            return [getattr(obj, self.choices.queryset.model.fk_fields[0]), obj.pk]
         else:
             return [None, None]
 
@@ -148,22 +148,27 @@ class TarifaForm(MDLBaseModelForm):
         model = Tarifa
         fields = ['nombre']
 
+
 class EscalasForm(forms.Form):
     desde = forms.IntegerField()
     hasta = forms.IntegerField()
 
 
 class ItemsEnergiaForm(forms.Form):
-    item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='EN'), widget=AutoCompleteFKMultiWidget())
-    iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES)
-    valor = forms.DecimalField(max_digits=5)
+    item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='EN'),
+                                  widget=AutoCompleteFKMultiWidget(attrs={'class': 'energia-item'}))
+    iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES,
+                            widget=forms.Select(attrs={'class': 'energia-iva'}))
+    valor = forms.DecimalField(max_digits=5, widget=forms.TextInput(attrs={'class': 'energia-valor'}))
     escala = forms.IntegerField(widget=forms.HiddenInput())
 
 
 class ItemsFijoForm(forms.Form):
-    item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='CF'), widget=AutoCompleteFKMultiWidget())
-    iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES)
-    valor = forms.DecimalField(max_digits=5)
+    item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='CF'),
+                                  widget=AutoCompleteFKMultiWidget(attrs={'class': 'fijos-item'}))
+    iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES,
+                            widget=forms.Select(attrs={'class': 'fijos-iva'}))
+    valor = forms.DecimalField(max_digits=5, widget=forms.TextInput(attrs={'class': 'energia-valor'}))
     escala = forms.IntegerField(widget=forms.HiddenInput())
 
 
@@ -174,10 +179,10 @@ class EscalonesForm(forms.Form):
     valor = forms.DecimalField(decimal_places=5)
 
 
-# class ItemsForm(MDLBaseModelForm):
-#     class Meta:
-#         model = Items
-#         fields = ['nombre', 'tipo', 'aplicacion', 'valor']
+class ItemsForm(MDLBaseModelForm):
+    class Meta:
+        model = Items
+        fields = ['nombre', 'tipo', 'aplicacion', 'servicios', 'base']
 
 
 class CespForm(MDLBaseModelForm):

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block siteTitle %}
     Sistema de Energia Prepaga - Tarifas
@@ -8,62 +9,146 @@
     Gestión de Tarifas
 {% endblock %}
 
+{% block headExtras %}
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/jquery.easy-autocomplete.min.js"></script>
+    <link rel="stylesheet" href="{% static "eac-mdl.css" %}">
+{% endblock %}
+
 {% block pageContent %}
     <div class="mdl-grid">
         <div class="mdl-cell--2-col"></div>
         <div class="mdl-cell--8-col">
             <form method="post" autocomplete="off" novalidate>{% csrf_token %}
                 <dialog class="mdl-dialog" style="width: 60%;">
+                    {{ itemsEnergia.management_form }}
+                    {{ itemsFijos.management_form }}
                     <h5 class="mdl-dialog__title">Modificación de escala</h5>
                     <div class="mdl-dialog__content">
                         <div class="mdl-grid">
                             <div class="mdl-cell--12-col">
-                                {{ itemsEnergia.management_form }}
-                                <table id="tabla-energia" class="mdl-data-table mdl-js-data-table" width="90%" style="margin: auto;">
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell">
+                                        <p>Items Energía</p>
+                                    </div>
+                                </div>
+                                <table id="tabla-energia" class="mdl-data-table mdl-js-data-table" width="100%">
                                     <thead>
                                     <td>Item</td>
                                     <td>IVA</td>
                                     <td>Valor</td>
                                     </thead>
+                                    <tbody>
                                     {% for itemEnergia in itemsEnergia %}
-                                        <tr>
-                                            <td>{{ itemEnergia.item }}</td>
+                                        <tr data-req="true" class="item-energia">
+                                            <td>{{ itemEnergia.item }}
+                                                <script>
+                                                    var options = {
+                                                        url: function (phrase) {
+                                                            return "{% url "get_items_energia_fk" %}" + "?ph=" + phrase;
+                                                        },
+
+                                                        getValue: "fk_display",
+
+                                                        list: {
+                                                            onChooseEvent: function () {
+                                                                var value = $("#id_energia-0-0-item_0").getSelectedItemData().pk;
+                                                                $("#id_energia-0-0-item_1").val(value).trigger("change");
+                                                            }
+                                                        }
+                                                    };
+
+                                                    $("#id_energia-0-0-item_0").easyAutocomplete(options);
+                                                    $("#id_energia-0-0-item_0").on("change", function () {
+                                                        if ($(this).val() == '') {
+                                                            $("#id_energia-0-0-item_1").val("").trigger("change");
+                                                        }
+                                                    });
+                                                </script>
+                                            </td>
                                             <td>{{ itemEnergia.iva }}</td>
                                             <td>{{ itemEnergia.valor }}</td>
                                         </tr>
                                     {% endfor %}
-                                    <tr id="item-energia-empty" style="display: none;">
+                                    <tr id="item-energia-empty" data-req="false" style="display: none;">
                                         <td>{{ itemsEnergia.empty_form.item }}</td>
                                         <td>{{ itemsEnergia.empty_form.iva }}</td>
                                         <td>{{ itemsEnergia.empty_form.valor }}</td>
                                     </tr>
+                                    </tbody>
                                 </table>
-                                {{ itemsFijos.management_form }}
-                                <table id="tabla-fijo" class="mdl-data-table mdl-js-data-table" width="90%" style="margin: auto;">
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell--1-col">
+                                        <button type="button" id="add-item-energia" data-escala="-1"
+                                        class="btn teal darken-1"><i
+                                            class="material-icons">add</i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell">
+                                        <p>Items Fijos</p>
+                                    </div>
+                                </div>
+                                <table id="tabla-fijo" class="mdl-data-table mdl-js-data-table" width="100%">
                                     <thead>
                                     <td>Item</td>
                                     <td>IVA</td>
                                     <td>Valor</td>
                                     </thead>
+                                    <tbody>
                                     {% for itemFijo in itemsFijos %}
-                                        <tr>
-                                            <td>{{ itemFijo.item }}</td>
+                                        <tr data-req="true" class="item-fijo">
+                                            <td>{{ itemFijo.item }}
+                                                <script>
+                                                    var options = {
+                                                        url: function (phrase) {
+                                                            return "{% url "get_items_fijos_fk" %}" + "?ph=" + phrase;
+                                                        },
+
+                                                        getValue: "fk_display",
+
+                                                        list: {
+                                                            onChooseEvent: function () {
+                                                                var value = $("#id_fijos-0-0-item_0").getSelectedItemData().pk;
+                                                                $("#id_fijos-0-0-item_1").val(value).trigger("change");
+                                                            }
+                                                        }
+                                                    };
+
+                                                    $("#id_fijos-0-0-item_0").easyAutocomplete(options);
+                                                    $("#id_fijos-0-0-item_0").on("change", function () {
+                                                        if ($(this).val() == '') {
+                                                            $("#id_fijos-0-0-item_1").val("").trigger("change");
+                                                        }
+                                                    });
+                                                </script>
+                                            </td>
                                             <td>{{ itemFijo.iva }}</td>
                                             <td>{{ itemFijo.valor }}</td>
                                         </tr>
                                     {% endfor %}
-                                    <tr id="item-fijo-empty" style="display: none;">
+                                    <tr id="item-fijo-empty" data-req="false" style="display: none;">
                                         <td>{{ itemsFijos.empty_form.item }}</td>
                                         <td>{{ itemsFijos.empty_form.iva }}</td>
                                         <td>{{ itemsFijos.empty_form.valor }}</td>
                                     </tr>
+                                    </tbody>
                                 </table>
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell--1-col">
+                                        <button type="button" id="add-item-fijo" data-escala="-1"
+                                                class="btn teal darken-1"><i
+                                                class="material-icons">add</i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="mdl-dialog__actions">
                         <button type="button"
-                                class="mdl-button mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent close">
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent close">
                             Cerrar
                         </button>
                     </div>
@@ -76,110 +161,6 @@
                             {{ tarifaForm.nombre.label_tag }}
                         </div>
                     </div>
-                    {#                    <div class="mdl-cell--6-col">#}
-                    {#                        <span id="show-escalones-dialog"#}
-                    {#                              class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">#}
-                    {#                            Escalones de energía#}
-                    {#                        </span>#}
-                    {#                        <dialog class="mdl-dialog" style="width: 500px;">#}
-                    {#                            <h5 class="mdl-dialog__title">Escalones de energía</h5>#}
-                    {#                            <div class="mdl-dialog__content">#}
-                    {#                                <div class="mdl-grid">#}
-                    {#                                    <div class="mdl-cell--12-col">#}
-                    {#                                        {{ escalonesFormset.management_form }}#}
-                    {#                                        <table id="escalones_energia" width="100%"#}
-                    {#                                               class="mdl-data-table mdl-js-data-table">#}
-                    {#                                            <thead>#}
-                    {#                                            <tr>#}
-                    {#                                                <th style="text-align: center">Desde</th>#}
-                    {#                                                <th style="text-align: center">Hasta</th>#}
-                    {#                                                <th style="text-align: center">Valor</th>#}
-                    {#                                            </tr>#}
-                    {#                                            </thead>#}
-                    {#                                            <tbody>#}
-                    {#                                            {% for escalon in escalonesFormset.forms %}#}
-                    {#                                                <tr class="escalon">#}
-                    {#                                                    <td class="columna_desde">#}
-                    {#                                                        {{ escalon.desde }}#}
-                    {#                                                    </td>#}
-                    {#                                                    <td class="columna_hasta">#}
-                    {#                                                        {{ escalon.hasta }}#}
-                    {#                                                    </td>#}
-                    {#                                                    <td class="columna_valor">#}
-                    {#                                                        {{ escalon.valor }}#}
-                    {#                                                    </td>#}
-                    {#                                                </tr>#}
-                    {#                                            {% endfor %}#}
-                    {#                                            <tr id="escalon-empty" style="visibility: hidden">#}
-                    {#                                                <td class="columna_desde">#}
-                    {#                                                    {{ escalonesFormset.empty_form.desde }}#}
-                    {#                                                </td>#}
-                    {#                                                <td class="columna_hasta">#}
-                    {#                                                    {{ escalonesFormset.empty_form.hasta }}#}
-                    {#                                                </td>#}
-                    {#                                                <td class="columna_valor">#}
-                    {#                                                    {{ escalonesFormset.empty_form.valor }}#}
-                    {#                                                </td>#}
-                    {#                                            </tr>#}
-                    {#                                            </tbody>#}
-                    {#                                        </table>#}
-                    {#                                    </div>#}
-                    {#                                </div>#}
-                    {#                            </div>#}
-                    {#                            <div class="mdl-dialog__actions">#}
-                    {#                                <button type="button"#}
-                    {#                                        class="mdl-button mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent close">#}
-                    {#                                    Cerrar#}
-                    {#                                </button>#}
-                    {#                                <a onclick="addEscalon('escalon')" id="agregar-escalon" class="mdl-button">Agregar</a>#}
-                    {#                            </div>#}
-                    {#                        </dialog>#}
-                    {#                        <script>#}
-                    {#                            var dialog = document.querySelector('dialog');#}
-                    {#                            var showDialogButton = document.querySelector('#show-escalones-dialog');#}
-                    {#                            if (!dialog.showModal) {#}
-                    {#                                dialogPolyfill.registerDialog(dialog);#}
-                    {#                            }#}
-                    {#                            showDialogButton.addEventListener('click', function () {#}
-                    {#                                dialog.showModal();#}
-                    {#                            });#}
-                    {#                            dialog.querySelector('.close').addEventListener('click', function () {#}
-                    {#                                dialog.close();#}
-                    {#                            });#}
-                    {##}
-                    {#                            function updateElementIndex(el, prefix, ndx) {#}
-                    {#                                var id_regex = new RegExp('('+ prefix +'-__prefix__-)');#}
-                    {#                                var replacement = prefix + '-' + ndx + '-';#}
-                    {#                                if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex,#}
-                    {#                                        replacement));#}
-                    {#                                if (el.id) el.id = el.id.replace(id_regex, replacement);#}
-                    {#                                if (el.name) el.name = el.name.replace(id_regex, replacement);#}
-                    {#                            }#}
-                    {##}
-                    {#                            function addEscalon(prefix) {#}
-                    {#                                var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());#}
-                    {#                                // Insert it after the last form#}
-                    {#                                var row = $("#escalon-empty").clone()#}
-                    {#                                        .removeAttr('style')#}
-                    {#                                        .removeAttr('id')#}
-                    {#                                        .addClass('escalon')#}
-                    {#                                        .insertAfter("#escalones_energia tbody tr:nth-last-child(2)")#}
-                    {#                                        .slideDown(300);#}
-                    {##}
-                    {#                                // Relabel or rename all the relevant bits#}
-                    {#                                $(row).children().children().each(function () {#}
-                    {#                                    updateElementIndex(this, prefix, formCount);#}
-                    {#                                    $(this).val("");#}
-                    {#                                    $(this).removeAttr('value');#}
-                    {#                                });#}
-                    {##}
-                    {#                                // Update the total form count#}
-                    {#                                $("#id_" + prefix + "-TOTAL_FORMS").val(formCount + 1);#}
-                    {##}
-                    {#                            }#}
-                    {##}
-                    {#                        </script>#}
-                    {#                    </div>#}
                 </div>
                 <div class="mdl-grid">
                     <div class="mdl-cell--12-col">
@@ -265,183 +246,7 @@
             </form>
         </div>
     </div>
-
-
-
-
-    {#{% block container %}#}
-    {#    <form id="formVentas" method="post" autocomplete="off" novalidate>{% csrf_token %}#}
-    {#        {{ ventaForm.subtotal }}#}
-    {#        <div class="mdl-shadow--2dp grey lighten-5">#}
-    {#            <div class="mdl-grid">#}
-    {#                <div class="mdl-cell--6-col">#}
-    {#                    <div class="mdl-textfield mdl-js-textfield">#}
-    {#                        {{ ventaForm.cliente }}#}
-    {#                        {{ ventaForm.cliente.label_tag }}#}
-    {#                        <script>#}
-    {#                            var options = {#}
-    {#                                url: function (phrase) {#}
-    {#                                    return "{% url "get_clientes_fk" %}" + "?ph=" + phrase;#}
-    {#                                },#}
-    {##}
-    {#                                getValue: "razon_social",#}
-    {##}
-    {#                                list: {#}
-    {#                                    onChooseEvent: function () {#}
-    {#                                        var value = $("#id_cliente_0").getSelectedItemData().pk;#}
-    {#                                        $("#id_cliente_1").val(value).trigger("change");#}
-    {#                                    }#}
-    {#                                }#}
-    {#                            };#}
-    {##}
-    {#                            $("#id_cliente_0").easyAutocomplete(options);#}
-    {#                            $("#id_cliente_0").on("change", function () {#}
-    {#                                if ($(this).val() == '') {#}
-    {#                                    $("#id_cliente_1").val("").trigger("change");#}
-    {#                                }#}
-    {#                            });#}
-    {#                        </script>#}
-    {#                    </div>#}
-    {#                </div>#}
-    {#                <div class="mdl-cell--3-col">#}
-    {#                    <div class="mdl-textfield mdl-js-textfield">#}
-    {#                        {{ ventaForm.tipoDisplay }}#}
-    {#                    </div>#}
-    {#                </div>#}
-    {#                <div class="mdl-cell--3-col">#}
-    {#                    <div class="mdl-textfield mdl-js-textfield">#}
-    {#                        <h5 id="info_comprobante">--------------</h5>#}
-    {#                    </div>#}
-    {#                </div>#}
-    {#            </div>#}
-    {#            <div class="mdl-grid">#}
-    {#                <div class="mdl-cell--2-col">#}
-    {#                    <div class="mdl-textfield mdl-js-textfield">{{ ventaForm.fecha }}#}
-    {#                        {{ ventaForm.fecha.label_tag }}</div>#}
-    {#                </div>#}
-    {#                <div class="mdl-cell mdl-cell--1-offset">#}
-    {#                    <div class="mdl-textfield mdl-js-textfield">{{ ventaForm.condicion_venta }}#}
-    {#                        {{ ventaForm.condicion_venta.label_tag }}</div>#}
-    {#                </div>#}
-    {#                <div class="mdl-cell mdl-cell--1-offset">#}
-    {#                    <div class="mdl-textfield mdl-js-textfield">{{ ventaForm.comprobantes_relacionados }}#}
-    {#                        {{ ventaForm.comprobantes_relacionados.label_tag }}</div>#}
-    {#                </div>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#        <div class="divider divider-margin-down"></div>#}
-    {#        <div class="mdl-grid">#}
-    {#            <div class="mdl-cell--12-col">#}
-    {#                <h4>Detalle</h4>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#        {{ detalleFormset.management_form }}#}
-    {#        <div class="mdl-grid">#}
-    {#            <div class="mdl-cell--12-col">#}
-    {#                <table id="detalle_factura" width="100%"#}
-    {#                       class="mdl-data-table mdl-js-data-table mdl-shadow--2dp highlight">#}
-    {#                    <thead>#}
-    {#                    <tr id="encabezado_detalle_factura">#}
-    {#                        <th style="width: 30px;">Tipo</th>#}
-    {#                        <th style="width: 150px;">Cantidad</th>#}
-    {#                        <th>Descripción</th>#}
-    {#                        <th style="width: 150px;">Precio Unitario</th>#}
-    {#                        <th style="width: 150px;">Descuento</th>#}
-    {#                        <th style="width: 150px;">Total Articulo</th>#}
-    {#                        <th style="width: 30px;"></th>#}
-    {#                    </tr>#}
-    {#                    </thead>#}
-    {#                    <tbody>#}
-    {#                    {% for detalle in detalleFormset.forms %}#}
-    {#                        <tr class="item">#}
-    {#                            <td class="columna_tipo_articulo">#}
-    {#                                {{ detalle.tipo }}#}
-    {#                                            <span class="mdl-chip mdl-color--blue-200">#}
-    {#                                            <span class="mdl-chip__text">AA</span></span>#}
-    {#                            </td>#}
-    {#                            <td class="columna_cantidad">{{ detalle.cantidad.errors }}{{ detalle.cantidad }}</td>#}
-    {#                            <td data-onlylabel class="columna_articulo">#}
-    {#                                {{ detalle.articulo.errors }}{{ detalle.articulo }}#}
-    {#                                <label id="id_det_venta-{{ forloop.counter0 }}-denominacion_articulo"#}
-    {#                                       class="denominacion_articulo">#}
-    {#                                    {% if detalle.denominacion_articulo_ro != "--vacio--appline--" %}#}
-    {#                                        {{ detalle.denominacion_articulo_ro }}#}
-    {#                                    {% else %}#}
-    {#                                        Haga click para buscar un articulo#}
-    {#                                    {% endif %}#}
-    {#                                </label>#}
-    {#                                {{ detalle.articulo_personalizado }}#}
-    {#                                <div style="text-align: center">#}
-    {#                                    <div style="display: inline-block; width: 47%; margin-right: 10px;text-align: left">{{ detalle.linea_articulo_personalizado }}</div>#}
-    {#                                    <div style="display: inline-block; width: 47%;">{{ detalle.iva_articulo_personalizado }}</div>#}
-    {#                                </div>#}
-    {#                                <div style="text-align: center;">#}
-    {#                                    <div style="display: inline-block;width: 60%;margin-right: 10px;"><label#}
-    {#                                            id="id_det_venta-{{ forloop.counter0 }}-composicion_articulo"#}
-    {#                                            class="composicion_articulo">#}
-    {#                                        {% if detalle.componer_articulo_ro != "--vacio--appline--" %}#}
-    {#                                            {{ detalle.componer_articulo_ro }}#}
-    {#                                        {% else %}#}
-    {#                                            Haga click para componer un articulo#}
-    {#                                        {% endif %}#}
-    {#                                    </label></div>#}
-    {#                                    <div style="width: 30%;display: inline-block; ">{{ detalle.iva_articulo_compuesto }}</div>#}
-    {#                                </div>#}
-    {#                            </td>#}
-    {#                            <td class="columna_precio">{{ detalle.precio_unitario }}</td>#}
-    {#                            <td class="columna_descuento">{{ detalle.descuento }}</td>#}
-    {#                            <td class="columna_total"><label class="total">$ 0.00</label></td>#}
-    {#                            <td>#}
-    {#                                <button type="button" class="delete btn red darken-2"><i#}
-    {#                                        class="material-icons">remove</i>#}
-    {#                                </button>#}
-    {#                            </td>#}
-    {#                        </tr>#}
-    {#                    {% endfor %}#}
-    {#                    </tbody>#}
-    {#                </table>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#        <div class="row">#}
-    {#            <div class="col s1">#}
-    {#                <button type="button" id="add_item_factura" class="btn teal darken-1"><i class="material-icons">add</i>#}
-    {#                </button>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#        <div class="divider divider-margin-down"></div>#}
-    {#        <div class="row">#}
-    {#            <div class="col s1"><h5>Subtotal</h5></div>#}
-    {#            <div class="col s1"><h5 id="importe_subtotal">0.00</h5></div>#}
-    {#            <div class="col s1">#}
-    {#                <div class="input-field">#}
-    {#                    {{ ventaForm.descuento }}#}
-    {#                    {{ ventaForm.descuento.label_tag }}#}
-    {#                </div>#}
-    {#            </div>#}
-    {#            <div class="col s1"><h5>Neto</h5></div>#}
-    {#            <div class="col s1"><h5 id="importe_neto">0.00</h5></div>#}
-    {#            <div class="col s1"><h5>IVA</h5></div>#}
-    {#            <div class="col s1"><h5 id="importe_iva">0.00</h5></div>#}
-    {#            <div class="col s1"><strong><h5>TOTAL</h5></strong></div>#}
-    {#            <div class="col s1"><strong><h5 id="importe_total">0.00</h5></strong></div>#}
-    {#        </div>#}
-    {#        <div class="divider divider-margin-down"></div>#}
-    {##}
-    {#    </form>#}
     <script>
-        {#        var letra;#}
-        {#        var subtotal_factura = 0;#}
-        {#        var row_detalle_factura_model;#}
-        {#        var row_articulo_compuesto_model;#}
-        {#        var items_compuestos = [];#}
-        {#        var es_b = false;#}
-        {##}
-        {#        function calcularDescuento(item) {#}
-        {#            var tot = parseFloat($(item).find(".cantidad_input_detalle").val()) * parseFloat($(item).find(".precio_unitario_input_detalle").val());#}
-        {#            var porc_desc = parseFloat($(item).find(".descuento_input_detalle").val()) / 100;#}
-        {#            return tot * porc_desc;#}
-        {#        }#}
-        {##}
         function updateElementIndex(el, prefix, ndx) {
             var id_regex = new RegExp('(' + prefix + '-__prefix__-)');
             var replacement = prefix + '-' + ndx + '-';
@@ -450,161 +255,45 @@
             if (el.id) el.id = el.id.replace(id_regex, replacement);
             if (el.name) el.name = el.name.replace(id_regex, replacement);
         }
-        {##}
-        {#        function updateArtCompChildIndexes(row, prefix, index, clear_input) {#}
-        {#            $(row).children().children().children().children().each(function () {#}
-        {#                updateElementIndex(this, prefix, index);#}
-        {#            });#}
-        {##}
-        {#            $(row).children().children().children().each(function () {#}
-        {#                updateElementIndex(this, prefix, index);#}
-        {#            });#}
-        {##}
-        {#            $(row).children().children().each(function () {#}
-        {#                updateElementIndex(this, prefix, index);#}
-        {#                if (clear_input) {#}
-        {#                    $(this).val("");#}
-        {#                    $(this).removeAttr('value');#}
-        {#                }#}
-        {#            });#}
-        {##}
-        {#            $(row).children().each(function () {#}
-        {#                updateElementIndex(this, prefix, index);#}
-        {#                if (clear_input) {#}
-        {#                    $(this).val("");#}
-        {#                    $(this).removeAttr('value');#}
-        {#                }#}
-        {#            });#}
-        {#        }#}
-        {##}
-        {#        function updateArtCompParentIndex(row, prefix, old_index, new_index) {#}
-        {#            function update(el, old, replacement) {#}
-        {#                if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(old, replacement));#}
-        {#                if (el.id) el.id = el.id.replace(old, replacement);#}
-        {#                if (el.name) el.name = el.name.replace(old, replacement);#}
-        {#            }#}
-        {##}
-        {#            var old = prefix + '-' + old_index + '-';#}
-        {#            var replacement = prefix + '-' + new_index + '-';#}
-        {#            $(row).children().children().children().children().each(function () {#}
-        {#                update(this, old, replacement);#}
-        {#                //$(this).val("");#}
-        {#                //$(this).removeAttr('value');#}
-        {#            });#}
-        {##}
-        {#            $(row).children().children().children().each(function () {#}
-        {#                update(this, old, replacement);#}
-        {#                //$(this).val("");#}
-        {#                //$(this).removeAttr('value');#}
-        {#            });#}
-        {##}
-        {#            $(row).children().children().each(function () {#}
-        {#                update(this, old, replacement);#}
-        {#                $(this).val("");#}
-        {#                $(this).removeAttr('value');#}
-        {#            });#}
-        {##}
-        {#            $(row).children().each(function () {#}
-        {#                update(this, old, replacement);#}
-        {#                $(this).val("");#}
-        {#                $(this).removeAttr('value');#}
-        {#            });#}
-        {#        }#}
-        {##}
-        {#        function actualizarTotalesFactura() {#}
-        {#            subtotal_factura = 0;#}
-        {#            var alics = {#}
-        {#                IVA21: 0, IV105: 0, IVA27: 0, IVA00: 0, IVA: function () {#}
-        {#                    return this.IVA21 + this.IV105 + this.IVA27#}
-        {#                }#}
-        {#            };#}
-        {#            var nalics = {IVA21: 0.21, IV105: 0.105, IVA27: 0.27, IVA00: 0}#}
-        {#            $("#detalle_factura .item").each(function () {#}
-        {#                subtotal_factura = subtotal_factura + parseFloat($(this).find(".total").text());#}
-        {#                alics[$(this).attr("data-alic")] += parseFloat($(this).find(".total").text()) * nalics[$(this).attr("data-alic")];#}
-        {#            });#}
-        {#            $("#importe_subtotal").text(redondear(subtotal_factura, 2));#}
-        {#            $("#id_subtotal").val(redondear(subtotal_factura, 2));#}
-        {#            if ($("#id_descuento").val() != "") {#}
-        {#                var desc = parseFloat($("#id_descuento").val());#}
-        {#            } else {#}
-        {#                var desc = 0;#}
-        {#            }#}
-        {#            console.log(nalics)#}
-        {#            console.log(alics)#}
-        {##}
-        {#            if (letra == 'b' | letra == 'c') {#}
-        {#                var nuevo_subtotal = subtotal_factura - (subtotal_factura * desc / 100);#}
-        {#                $("#importe_neto").text(redondear(nuevo_subtotal, 2));#}
-        {#                iva = 0;#}
-        {#                $("#importe_iva").text(redondear(iva, 2));#}
-        {#                $("#importe_total").text(redondear(nuevo_subtotal, 2));#}
-        {#            }#}
-        {#            else {#}
-        {#                var nuevo_subtotal = subtotal_factura - (subtotal_factura * desc / 100);#}
-        {#                $("#importe_neto").text(redondear(nuevo_subtotal, 2));#}
-        {#                console.log(alics.IVA());#}
-        {#                iva = alics.IVA();#}
-        {#                total = nuevo_subtotal + iva;#}
-        {#                $("#importe_iva").text(redondear(iva, 2));#}
-        {#                $("#importe_total").text(redondear(total, 2));#}
-        {#            }#}
-        {#        }#}
-        {##}
-        {#        function adecuarArticulo(item_cambiado) {#}
-        {#            //Art. almacenado#}
-        {#            if ($("option:selected", $(item_cambiado).find(".tipo_articulo_select")).val() == 'AA') {#}
-        {#                $(item_cambiado).find("td.columna_articulo").attr("data-onlylabel");#}
-        {#                $(item_cambiado).find(".denominacion_articulo").show();#}
-        {#                $(item_cambiado).find(".linea_articulo_personalizado_select_detalle").hide();#}
-        {#                $(item_cambiado).find(".iva_articulo_personalizado_select_detalle").hide();#}
-        {#                $(item_cambiado).find(".iva_articulo_compuesto_select_detalle").hide();#}
-        {#                $(item_cambiado).find(".articulo_personalizado_input_detalle").hide();#}
-        {#                $(item_cambiado).find(".composicion_articulo").hide();#}
-        {#                $(item_cambiado).find(".precio_unitario_input_detalle").attr("readonly", false);#}
-        {#            }#}
-        {#            //Art. Personalizado#}
-        {#            else if ($("option:selected", $(item_cambiado).find(".tipo_articulo_select")).val() == 'AP') {#}
-        {#                $(item_cambiado).find("td.columna_articulo").removeAttr("data-onlylabel");#}
-        {#                $(item_cambiado).find(".denominacion_articulo").hide();#}
-        {#                $(item_cambiado).find(".linea_articulo_personalizado_select_detalle.select-wrapper").show();#}
-        {#                $(item_cambiado).find(".iva_articulo_personalizado_select_detalle.select-wrapper").show();#}
-        {#                $(item_cambiado).find(".iva_articulo_compuesto_select_detalle").hide();#}
-        {#                $(item_cambiado).find(".articulo_personalizado_input_detalle").show();#}
-        {#                $(item_cambiado).find(".composicion_articulo").hide();#}
-        {#                $(item_cambiado).find(".precio_unitario_input_detalle").attr("readonly", false);#}
-        {#            }#}
-        {#            //Art. compuesto#}
-        {#            else if ($("option:selected", $(item_cambiado).find(".tipo_articulo_select")).val() == 'AC') {#}
-        {#                $(item_cambiado).find("td.columna_articulo").attr("data-onlylabel");#}
-        {#                $(item_cambiado).find(".denominacion_articulo").hide();#}
-        {#                $(item_cambiado).find(".linea_articulo_personalizado_select_detalle").hide();#}
-        {#                $(item_cambiado).find(".iva_articulo_personalizado_select_detalle").hide();#}
-        {#                $(item_cambiado).find(".iva_articulo_compuesto_select_detalle.select-wrapper").show();#}
-        {#                $(item_cambiado).find(".articulo_personalizado_input_detalle").hide();#}
-        {#                $(item_cambiado).find(".composicion_articulo").show();#}
-        {#                $(item_cambiado).find(".precio_unitario_input_detalle").attr("readonly", true);#}
-        {#            }#}
-        {#        }#}
-        {##}
-        {#        function adecuarArticuloCompuesto(item_art_compuesto) {#}
-        {#            if ($(item_art_compuesto).find(".pers_checkbox").is(":checked")) {#}
-        {#                $(item_art_compuesto).find("td.columna_articulo").removeAttr("data-onlylabel");#}
-        {#                $(item_art_compuesto).find(".articulo_personalizado_input_compuesto").show();#}
-        {#                $(item_art_compuesto).find(".linea_articulo_personalizado_select_compuesto.select-wrapper").show();#}
-        {#                $(item_art_compuesto).find(".denominacion_articulo").hide();#}
-        {#            }#}
-        {#            else {#}
-        {#                $(item_art_compuesto).find("td.columna_articulo").attr("data-onlylabel");#}
-        {#                $(item_art_compuesto).find(".articulo_personalizado_input_compuesto").hide();#}
-        {#                $(item_art_compuesto).find(".linea_articulo_personalizado_select_compuesto").hide();#}
-        {#                $(item_art_compuesto).find(".denominacion_articulo").show();#}
-        {#            }#}
-        {##}
-        {#        }#}
-        {##}
-        function addEscala(prefix) {
 
+        function updateElementCompIndex(el, prefix, ndx) {
+            var regpre = /(\w+)-(\d+)/.exec(prefix);
+            var id_regex = new RegExp('(' + regpre[1] + '-0-__prefix__-)');
+            var replacement = regpre[1] + '-' + regpre[2] + '-' + ndx + '-';
+            if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex,
+                    replacement));
+            if (el.id) el.id = el.id.replace(id_regex, replacement);
+            if (el.name) el.name = el.name.replace(id_regex, replacement);
+        }
+
+        function addEscala(prefix) {
+            function addMGMForm(prefix) {
+                var t = prefix;
+                $("<input>", {
+                    id: "id_" + t + "-TOTAL_FORMS",
+                    name: t + "-TOTAL_FORMS",
+                    type: "hidden",
+                    value: 0
+                }).appendTo("dialog");
+                $("<input>", {
+                    id: "id_" + t + "-TOTAL_FORMS",
+                    name: t + "-INITIAL_FORMS",
+                    type: "hidden",
+                    value: 0
+                }).appendTo("dialog");
+                $("<input>", {
+                    id: "id_" + t + "-TOTAL_FORMS",
+                    name: t + "-MIN_NUM_FORMS",
+                    type: "hidden",
+                    value: 0
+                }).appendTo("dialog");
+                $("<input>", {
+                    id: "id_" + t + "-TOTAL_FORMS",
+                    name: t + "-MAX_NUM_FORMS",
+                    type: "hidden",
+                    value: 1000
+                }).appendTo("dialog");
+            }
 
             var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
             if (formCount < 20) {
@@ -625,603 +314,177 @@
 
                 // Update the total form count
                 $("#id_" + prefix + "-TOTAL_FORMS").val(formCount + 1);
+
+                //Agrego nuevo mgm_form
+                addMGMForm("fijos-" + formCount);
+                addMGMForm("energia-" + formCount);
+
+                //Agrego los items requeridos
+                $.get("{% url "get_items_fijos_req" %}", function (json) {
+                    var items = JSON.parse(json);
+                    console.log(items);
+                    items.forEach(function (item) {
+                        var row = addItemFijo("fijos-" + formCount, true);
+                        $(row).find('.fijos-item[name$="_0"]').val(item.nombre);
+                        $(row).find('.fijos-item[name$="_1"]').val(item.pk);
+                    });
+                });
+                //Agrego los items requeridos
+                $.get("{% url "get_items_energia_req" %}", function (json) {
+                    var items = JSON.parse(json);
+                    console.log(items);
+                    items.forEach(function (item) {
+                        var row = addItemEnergia("energia-" + formCount, true);
+                        $(row).find('.energia-item[name$="_0"]').val(item.nombre);
+                        $(row).find('.energia-item[name$="_1"]').val(item.pk);
+                    });
+                });
+
             } // End if
             else {
                 alert("Solo se puede agregar 20 item por factura");
             }
         }
 
-        function editarEscala(escala) {
+        function editarEscala(n_escala) {
             var dialog = document.querySelector('dialog');
-            {#            var showDialogButton = document.querySelector('#show-escalones-dialog');#}
             if (!dialog.showModal) {
                 dialogPolyfill.registerDialog(dialog);
             }
+            $('dialog tbody tr').hide();
+            $('dialog .energia-item[name*="energia-' + n_escala + '-"]').each(function () {
+                $(this).parents(".item-energia").show();
+            });
+            $("dialog #add-item-energia").attr("data-escala", n_escala);
+            $('dialog .fijos-item[name*="fijos-' + n_escala + '-"]').each(function () {
+                $(this).parents(".item-fijo").show();
+            });
+            $("dialog #add-item-fijo").attr("data-escala", n_escala);
             dialog.showModal();
             dialog.querySelector('.close').addEventListener('click', function () {
                 dialog.close();
             });
         }
-        {#        function deleteItemFactura(btn, prefix) {#}
-        {#            var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());#}
-        {#            if (formCount > 1) {#}
-        {#                //Si es AC borrar todos los hijos#}
-        {#                if ($("option:selected", $(btn).parents(".item").find(".tipo_articulo_select")).val() == 'AC') {#}
-        {#                    var regex = /det_venta-(\d+)-/g;#}
-        {#                    var num = regex.exec($(btn).parents(".item").find(".articulo_input_detalle").attr("id"));#}
-        {#                    $(".item_composicion_articulo").each(function () {#}
-        {#                        if ($(this).find('input[name^="art_comp-' + num[1] + '"]')) {#}
-        {#                            $(this).remove();#}
-        {#                        }#}
-        {#                    });#}
-        {#                    $('input[name="art_comp-' + num[1] + '-TOTAL_FORMS"]').remove();#}
-        {#                    $('input[name="art_comp-' + num[1] + '-INITIAL_FORMS"]').remove();#}
-        {#                    $('input[name="art_comp-' + num[1] + '-MIN_NUM_FORMS"]').remove();#}
-        {#                    $('input[name="art_comp-' + num[1] + '-MAX_NUM_FORMS"]').remove();#}
-        {#                }#}
-        {#                // Delete the item/form#}
-        {#                $(btn).parents('.item').remove();#}
-        {#                var forms = $('.item'); // Get all the forms#}
-        {#                // Update the total number of forms (1 less than before)#}
-        {#                $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);#}
-        {#                var i = 0;#}
-        {#                // Go through the forms and set their indices, names and IDs#}
-        {#                for (formCount = forms.length; i < formCount; i++) {#}
-        {#                    $(forms.get(i)).children().children().each(function () {#}
-        {#                        updateElementIndex(this, prefix, i);#}
-        {#                    });#}
-        {#                }#}
-        {#                actualizarTotalesFactura();#}
-        {#            } // End if#}
-        {#            else {#}
-        {#                alert("La factura debe contener al menos un item");#}
-        {#            }#}
-        {#            return false;#}
-        {#        }#}
-        {##}
-        {#        //Paso como param la fila que se agrego o actualizo#}
-        {#        function actualizarPTItemFactura(item) {#}
-        {#            if ($(item).find(".cantidad_input_detalle").val() && $(item).find(".precio_unitario_input_detalle").val()) {#}
-        {#                if ($(item).find(".cantidad_input_detalle").val().split(":").length - 1 == 1) {//Es tiempo, hay un ":"#}
-        {#                    var cantidad = parseInt($(item).find(".cantidad_input_detalle").val().split(":")[0]) + parseInt($(item).find(".cantidad_input_detalle").val().split(":")[1]) / 60;#}
-        {#                } else {#}
-        {#                    var cantidad = parseFloat($(item).find(".cantidad_input_detalle").val());#}
-        {#                }#}
-        {#                $(item).find(".total").text(redondear(parseFloat($(item).find(".precio_unitario_input_detalle").val()) * cantidad, 2));#}
-        {#                var tot = parseFloat($(item).find(".total").text());#}
-        {#                if ($(item).find(".descuento_input_detalle").val() > 0.00) {#}
-        {#                    var des = calcularDescuento(item);#}
-        {#                    tot = tot - des;#}
-        {#                    $(item).find(".total").text(redondear(tot, 2));#}
-        {#                }#}
-        {#                actualizarTotalesFactura();#}
-        {#            } else {#}
-        {#                $(item).find(".total").text("0.00");#}
-        {#            }#}
-        {#        }#}
-        {##}
-        {#        //Paso la fila en la que se va a componer el articulo#}
-        {#        function componerArticulo(item_factura) {#}
-        {#            function updateMGMForm(prefix, old_index, new_index) {#}
-        {#                var old = prefix + '-' + old_index + '-';#}
-        {#                var replacement = prefix + '-' + new_index + '-';#}
-        {##}
-        {#                //Management Forms#}
-        {#                $("input[id=id_" + prefix + "-" + old_index + "-TOTAL_FORMS]").attr("id", $("input[id=id_" + prefix + "-" + old_index + "-TOTAL_FORMS]").attr("id").replace(old, replacement));#}
-        {#                $("input[name=" + prefix + "-" + old_index + "-TOTAL_FORMS]").attr("name", $("input[name=" + prefix + "-" + old_index + "-TOTAL_FORMS]").attr("name").replace(old, replacement));#}
-        {#                $("input[id=id_" + prefix + "-" + old_index + "-INITIAL_FORMS]").attr("id", $("input[id=id_" + prefix + "-" + old_index + "-INITIAL_FORMS]").attr("id").replace(old, replacement));#}
-        {#                $("input[name=" + prefix + "-" + old_index + "-INITIAL_FORMS]").attr("name", $("input[name=" + prefix + "-" + old_index + "-INITIAL_FORMS]").attr("name").replace(old, replacement));#}
-        {#                $("input[id=id_" + prefix + "-" + old_index + "-MIN_NUM_FORMS]").attr("id", $("input[id=id_" + prefix + "-" + old_index + "-MIN_NUM_FORMS]").attr("id").replace(old, replacement));#}
-        {#                $("input[name=" + prefix + "-" + old_index + "-MIN_NUM_FORMS]").attr("name", $("input[name=" + prefix + "-" + old_index + "-MIN_NUM_FORMS]").attr("name").replace(old, replacement));#}
-        {#                $("input[id=id_" + prefix + "-" + old_index + "-MAX_NUM_FORMS]").attr("id", $("input[id=id_" + prefix + "-" + old_index + "-MAX_NUM_FORMS]").attr("id").replace(old, replacement));#}
-        {#                $("input[name=" + prefix + "-" + old_index + "-MAX_NUM_FORMS]").attr("name", $("input[name=" + prefix + "-" + old_index + "-MAX_NUM_FORMS]").attr("name").replace(old, replacement));#}
-        {##}
-        {#            }#}
-        {##}
-        {#            function addMGMForm(prefix, new_index) {#}
-        {#                var t = prefix + "-" + new_index;#}
-        {#                $("<input>", {#}
-        {#                    id: "id_" + t + "-TOTAL_FORMS",#}
-        {#                    name: t + "-TOTAL_FORMS",#}
-        {#                    type: "hidden",#}
-        {#                    value: 0#}
-        {#                }).appendTo("div#composicion_articulo");#}
-        {#                $("<input>", {#}
-        {#                    id: "id_" + t + "-TOTAL_FORMS",#}
-        {#                    name: t + "-INITIAL_FORMS",#}
-        {#                    type: "hidden",#}
-        {#                    value: 0#}
-        {#                }).appendTo("div#composicion_articulo");#}
-        {#                $("<input>", {#}
-        {#                    id: "id_" + t + "-TOTAL_FORMS",#}
-        {#                    name: t + "-MIN_NUM_FORMS",#}
-        {#                    type: "hidden",#}
-        {#                    value: 0#}
-        {#                }).appendTo("div#composicion_articulo");#}
-        {#                $("<input>", {#}
-        {#                    id: "id_" + t + "-TOTAL_FORMS",#}
-        {#                    name: t + "-MAX_NUM_FORMS",#}
-        {#                    type: "hidden",#}
-        {#                    value: 1000#}
-        {#                }).appendTo("div#composicion_articulo");#}
-        {#            }#}
-        {##}
-        {#            var regex = /det_venta-(\d+)-/g;#}
-        {#            var num = regex.exec($(item_factura).find(".articulo_input_detalle").attr("id"));#}
-        {#            $("#add_item_articulo_compuesto").attr("data-actual_parent", num[1]);#}
-        {#            //Ese item no tiene articulo compuesto#}
-        {#            if (jQuery.inArray(num[1], items_compuestos) == -1) {#}
-        {#                //Si no hay ninguno que tenga articulo compuesto...#}
-        {#                if ($(".item_composicion_articulo").length == 1 && $(".item_composicion_articulo").find(".precio_unitario_input_compuesto").val() == "") {#}
-        {#                    updateMGMForm('art_comp', 0, num[1]);#}
-        {#                    updateArtCompParentIndex($(".item_composicion_articulo")[0], "art_comp", 0, num[1]);#}
-        {#                    $("#id_art_comp-" + num[1] + "-0-id_detalle_venta").show();#}
-        {#                    $("#id_art_comp-" + num[1] + "-0-pers").show();#}
-        {#                    $("#id_art_comp-" + num[1] + "-0-cantidad").show();#}
-        {#                    $("#id_art_comp-" + num[1] + "-0-denominacion_articulo").show();#}
-        {#                    $("#id_art_comp-" + num[1] + "-0-articulo_personalizado").hide();#}
-        {#                    $("#id_art_comp-" + num[1] + "-0-linea_articulo_personalizado").parents(".linea_articulo_personalizado_select.select-wrapper").hide();#}
-        {#                    $("#id_art_comp-" + num[1] + "-0-precio_unitario").show();#}
-        {#                }#}
-        {#                else {#}
-        {#                    $(".item_composicion_articulo").each(function () {#}
-        {#                        $(this).hide();#}
-        {#                    });#}
-        {#                    $("#descripcion_articulo_compuesto").val("");#}
-        {#                    $("#total_articulo_compuesto").text("Total: $ 0.00");#}
-        {#                    addMGMForm("art_comp", num[1]);#}
-        {#                    addItemArtCompuesto("art_comp", num[1]);#}
-        {#                }#}
-        {#            }#}
-        {#            //Este item ya es articulo compuesto#}
-        {#            else {#}
-        {#                $(".item_composicion_articulo").each(function () {#}
-        {#                    $(this).hide();#}
-        {#                })#}
-        {#                $(".item_composicion_articulo > .id_detalle_venta_hidden[value=" + num[1] + "]").each(function () {#}
-        {#                    $(this).parents(".item_composicion_articulo").show();#}
-        {#                    actualizarPTArticuloCompuesto($(this).parents(".item_composicion_articulo"));#}
-        {#                });#}
-        {#                $("#descripcion_articulo_compuesto").val($("#id_det_venta-" + num[1] + "-composicion_articulo").text().trim());#}
-        {##}
-        {#            }#}
-        {#            var options_modal = {#}
-        {#                dismissible: false,#}
-        {#                ready: function () {#}
-        {#                    actualizarTotalesArtComp();#}
-        {#                    $("#ac-modal-aceptar").on("click", function () {#}
-        {#                        confirmarComponerArticulo(num[1]);#}
-        {#                    });#}
-        {#                }, // Callback for Modal open#}
-        {#            }#}
-        {#            $("#composicion_articulo").openModal(options_modal);#}
-        {#        }#}
-        {##}
-        {#        function addItemArtCompuesto(prefix, parent) {#}
-        {#            var formCount = parseInt($('#id_' + prefix + '-' + parent + '-TOTAL_FORMS').val());#}
-        {#            var row = $(row_articulo_compuesto_model).clone().appendTo("#detalle_composicion_articulo tbody").slideDown(300);#}
-        {##}
-        {#            $(".errorlist", row).remove();#}
-        {#            $(row).children().removeClass("error");#}
-        {##}
-        {#            updateArtCompParentIndex(row, "art_comp", 0, parent);#}
-        {#            updateArtCompChildIndexes(row, prefix + '-' + parent, formCount, true);#}
-        {##}
-        {#            //Acomodo los campos#}
-        {#            $(row).find("select").show();#}
-        {#            $(row).find("select").material_select();#}
-        {#            $(row).find(".pers_checkbox").prop("checked", false).trigger("change");#}
-        {#            //$(row).find(".linea_articulo_personalizado_select").hide();#}
-        {#            //$(row).find(".articulo_personalizado_input").hide();#}
-        {#            $(row).find(".total").text("0.00");#}
-        {#            $(row).find(".denominacion_articulo").text("Haga click para buscar un articulo");#}
-        {##}
-        {#            // Update the total form count#}
-        {#            $("#id_" + prefix + "-" + parent + "-TOTAL_FORMS").val(formCount + 1);#}
-        {#            return false;#}
-        {#        }#}
-        {##}
-        {#        function deleteItemArtCompuesto(btn, prefix) {#}
-        {#            var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());#}
-        {#            if ($(".item_composicion_articulo:visible").length > 1) {#}
-        {#                // Delete the item/form#}
-        {#                var el_total = $("#total_articulo_compuesto");#}
-        {#                var total_articulo = parseFloat(el_total.text().replace("Total: $", ""));#}
-        {#                var prec_item = parseFloat($(btn).parents(".item_composicion_articulo").find(".total").text());#}
-        {#                total_articulo = total_articulo - prec_item;#}
-        {#                $(el_total).text(redondear(total_articulo, 2));#}
-        {#                $(btn).parents('.item_composicion_articulo').remove();#}
-        {#                var forms = $('.item_composicion_articulo:visible'); // Get all the forms#}
-        {#                // Update the total number of forms (1 less than before)#}
-        {#                $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);#}
-        {#                var i = 0;#}
-        {#                // Go through the forms and set their indices, names and IDs#}
-        {#                for (formCount = forms.length; i < formCount; i++) {#}
-        {#                    $(forms.get(i)).each(function () {#}
-        {#                        updateArtCompChildIndexes(this, prefix, i, false)#}
-        {#                    });#}
-        {#                    $(forms.get(i)).children().children().each(function () {#}
-        {#                        updateElementIndex(this, prefix, i);#}
-        {#                    });#}
-        {#                }#}
-        {#            } // End if#}
-        {#            else {#}
-        {#                alert("El articulo compuesto debe tener al menos un item");#}
-        {#            }#}
-        {#            return false;#}
-        {#        }#}
-        {##}
-        {#        //Paso la fila que se actualizo o agrego#}
-        {#        function actualizarPTArticuloCompuesto(row) {#}
-        {#            if ($(row).find(".cantidad_input_compuesto").val() && $(row).find(".precio_unitario_input_compuesto").val()) {#}
-        {#                if ($(row).find(".cantidad_input_compuesto").val().split(":").length - 1 == 1) {//Es tiempo, hay un ":"#}
-        {#                    var cantidad = parseInt($(row).find(".cantidad_input_compuesto").val().split(":")[0]) + parseInt($(row).find(".cantidad_input_compuesto").val().split(":")[1]) / 60#}
-        {#                } else {#}
-        {#                    var cantidad = parseFloat($(row).find(".cantidad_input_compuesto").val())#}
-        {#                }#}
-        {#                var tot = cantidad * parseFloat($(row).find(".precio_unitario_input_compuesto").val());#}
-        {#                $(row).find(".total").text(redondear(tot, 2));#}
-        {#                actualizarTotalesArtComp();#}
-        {#            } else {#}
-        {#                $(row).find(".total").text("0.00");#}
-        {#            }#}
-        {#        }#}
-        {##}
-        {#        function actualizarTotalesArtComp() {#}
-        {#            var total_art_comp = 0;#}
-        {#            $(".item_composicion_articulo:visible").each(function () {#}
-        {#                total_art_comp = total_art_comp + parseFloat($(this).find(".total").text());#}
-        {#            });#}
-        {#            $("#total_articulo_compuesto").text(redondear(total_art_comp, 2));#}
-        {#        }#}
-        {##}
-        {#        function confirmarComponerArticulo(item_factura) {#}
-        {#            //VALIDACIONES#}
-        {#            if ($(".cantidad_input_compuesto,.precio_unitario_input_compuesto,.articulo_input_compuesto,.articulo_personalizado_input_compuesto").valid()) {#}
-        {#                $("#ac-modal-aceptar").off();#}
-        {#                //.linea_articulo_personalizado_select_compuesto, .articulo_personalizado_input_compuesto#}
-        {##}
-        {#                var row = $(".item")[item_factura];#}
-        {#                $(row).find(".composicion_articulo").text($("#descripcion_articulo_compuesto").val());#}
-        {#                $(row).find(".articulo_personalizado_input_detalle").val($("#descripcion_articulo_compuesto").val());#}
-        {#                $("#descripcion_articulo_compuesto").val("");#}
-        {#                $(row).find(".precio_unitario_input_detalle").val($("#total_articulo_compuesto").text().replace("Total: $", ""));#}
-        {#                actualizarPTItemFactura($(row));#}
-        {#                $(".item_composicion_articulo:visible").each(function () {#}
-        {#                    $(this).find(".id_detalle_venta_hidden").val(item_factura);#}
-        {#                });#}
-        {#                if (jQuery.inArray(item_factura, items_compuestos) == -1) {#}
-        {#                    items_compuestos[items_compuestos.length] = item_factura#}
-        {#                }#}
-        {#                $("#composicion_articulo").closeModal();#}
-        {#            }#}
-        {##}
-        {#        }#}
-        {##}
-        {#        function seleccionarArticuloAlmacenado(item) {#}
-        {#            var options_modal = {#}
-        {#                dismissible: false,#}
-        {#                ready: function () {#}
-        {#                    $("#aa-modal-aceptar").click(function () {#}
-        {#                        confirmarSeleccionArticuloAlmacenado(item);#}
-        {#                    });#}
-        {#                }, // Callback for Modal open#}
-        {#                complete: function () {#}
-        {#                    $("#seleccion_articulo .div-appline-autocomplete").empty().hide();#}
-        {#                    $("#seleccion_articulo input").val("");#}
-        {##}
-        {#                } // Callback for Modal close#}
-        {#            }#}
-        {#            $("#seleccion_articulo").openModal(options_modal);#}
-        {#        }#}
-        {##}
-        {#        function confirmarSeleccionArticuloAlmacenado(item) {#}
-        {#            $("#aa-modal-aceptar").off();#}
-        {#            var aa = "#seleccion_articulo table .appline-autocomplete-row-selected";#}
-        {#            item.attr("data-alic", $(aa).attr("data-alic"));#}
-        {#            item.find(".denominacion_articulo").text($(aa + " .descripcion-aa").text());#}
-        {#            item.find(".articulo_input_detalle").val($(aa).attr("data-item-pk"));#}
-        {#            item.find(".precio_unitario_input_detalle").val($(aa + " .precio-aa").text().replace("$", ""));#}
-        {#            item.find(".total").text(redondear(parseFloat(item.find(".precio_unitario_input_detalle").val()) * parseFloat(item.find(".cantidad_input_detalle").val()), 2));#}
-        {#            if (item.parents("#detalle_composicion_articulo").length > 0) {#}
-        {#                actualizarPTArticuloCompuesto(item);#}
-        {#                actualizarTotalesArtComp(item);#}
-        {#            }#}
-        {#            else {#}
-        {#                actualizarPTItemFactura(item);#}
-        {#                actualizarTotalesFactura();#}
-        {#            }#}
-        {#        }#}
-        {##}
-        {##}
-        {#        $(document).ready(function () {#}
-        {#            INICIALIZADORES#}
-        {#            row_detalle_factura_model = $(".item:first").clone(false)[0];#}
-        {#            row_articulo_compuesto_model = $(".item_composicion_articulo:first").clone(false)[0];#}
-        {#            $('#id_comprobantes_relacionados').prop('disabled', true);#}
-        {##}
-        {#            $('select').material_select();#}
-        {##}
-        {##}
-        {#    HABILITO AUTOCOMPLETAR DE APPLINE#}
-        {#            $("#id_clienteDisplay").applineAutocomplete("{% url "get_clientes_search" %}");#}
-        {#            $("#id_aa-search").AaApplineAutocomplete("{% url "get_articulos_almacenados_search" %}", $("#aa-table"));#}
-        {##}
-        {#            LISTENER PARA DATOS DE COMPROBANTE#}
-        {#            $(document).on("change", "#id_cliente, #id_tipoDisplay", function () {#}
-        {#                if ($("#id_cliente").val() != "") {#}
-        {#                    $.ajax({#}
-        {#                        url: "{% url 'get_comprobante_info' %}",#}
-        {##}
-        {#                        data: {id_cliente: $("#id_cliente").val(), tipo: $("#id_tipoDisplay").val()},#}
-        {#                        type: 'GET',#}
-        {#                        dataType: 'json',#}
-        {##}
-        {#                        success: function (json) {#}
-        {#                            letra = json.letra;#}
-        {#                            if (json.letra == "b") {#}
-        {#                                es_b = true;#}
-        {#                            } else {#}
-        {#                                es_b = false;#}
-        {#                            }#}
-        {#                            $("#info_comprobante").text(json.info);#}
-        {#                        },#}
-        {#                    });#}
-        {##}
-        {#                    $.ajax({#}
-        {#                        url: "{% url "get_posibles_comprobantes_relacionados" %}",#}
-        {##}
-        {#                        data: {id_cliente: $("#id_cliente").val()},#}
-        {#                        type: 'GET',#}
-        {#                        dataType: 'json',#}
-        {##}
-        {#                        success: function (json) {#}
-        {#                            if (json) {#}
-        {#                                json.each(function () {#}
-        {#                                    var co = jQuery.parseJSON(this);#}
-        {#                                    $("option").text(co.info).appendTo("#id_comprobantes_relacionados");#}
-        {#                                })#}
-        {#                                $('#id_comprobantes_relacionados').prop('disabled', false);#}
-        {#                            }#}
-        {#                            else {#}
-        {#                                $('#id_comprobantes_relacionados').clear().prop('disabled', true);#}
-        {#                            }#}
-        {##}
-        {#                        },#}
-        {#                    });#}
-        {#                }#}
-        {#                else {#}
-        {#                    $("#info_comprobante").text("--------------");#}
-        {#                }#}
-        {#            });#}
-        {##}
-        {#            LISTENER PARA CAMBIO DE TIPO DE ARTICULO#}
-        {#            $("#detalle_factura").on("change", "select.tipo_articulo_select", function () {#}
-        {#                adecuarArticulo($(this).parents(".item"));#}
-        {#            });#}
-        {##}
-        {#            $("#detalle_composicion_articulo").on("change", "input.pers_checkbox", function () {#}
-        {#                adecuarArticuloCompuesto($(this).parents(".item_composicion_articulo"));#}
-        {#            })#}
-        {##}
-        {#            $('.tipo_articulo_select').trigger("change");#}
-        {#            $('input.pers_checkbox').trigger("change");#}
-        {##}
-        $("#add_escala").click(function () {
-            addEscala("escala");
-        });
 
-        $(".escala-edit").on('click', function () {
-            editarEscala($(this).parents('escala'));
+        function addItemEnergia(prefix) {
+            var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+            if (formCount < 20) {
+                // Insert it after the last form
+                var row = $("#item-energia-empty").clone()
+                        .removeAttr('style')
+                        .removeAttr('id')
+                        .addClass('item-energia')
+                        .insertAfter("#tabla-energia tbody tr:nth-last-child(2)")
+                        .slideDown(300);
+
+                // Relabel or rename all the relevant bits
+                $(row).children().children().each(function () {
+                    updateElementCompIndex(this, prefix, formCount);
+                    $(this).val("");
+                    $(this).removeAttr('value');
+                });
+
+                //Autocompletar en item
+                var options = {
+                    url: function (phrase) {
+                        return "{% url "get_items_energia_fk" %}" + "?ph=" + phrase;
+                    },
+
+                    getValue: "fk_display",
+
+                    list: {
+                        onChooseEvent: function () {
+                            var value = $("#id_" + prefix + "-" + formCount + "-item_0").getSelectedItemData().pk;
+                            $("#id_" + prefix + "-" + formCount + "-item_1").val(value).trigger("change");
+                        }
+                    }
+                };
+
+                $("#id_" + prefix + "-" + formCount + "-item_0").easyAutocomplete(options);
+                $("#id_" + prefix + "-" + formCount + "-item_0").on("change", function () {
+                    if ($(this).val() == '') {
+                        $("#id_" + prefix + "-" + formCount + "-item_1").val("").trigger("change");
+                    }
+                });
+
+                // Update the total form count
+                $("#id_" + prefix + "-TOTAL_FORMS").val(formCount + 1);
+                return row;
+            } // End if
+            else {
+                alert("Solo se puede agregar 20 item por factura");
+            }
+        }
+
+        function addItemFijo(prefix, req) {
+            var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+            if (formCount < 20) {
+                // Insert it after the last form
+                var row = $("#item-fijo-empty").clone()
+                        .removeAttr('style')
+                        .removeAttr('id')
+                        .addClass('item-fijo')
+                        .attr("data-req", String(req))
+                        .insertAfter("#tabla-fijo tbody tr:nth-last-child(2)")
+                        .slideDown(300);
+
+                // Relabel or rename all the relevant bits
+                $(row).children().children().each(function () {
+                    updateElementCompIndex(this, prefix, formCount);
+                    $(this).val("");
+                    $(this).removeAttr('value');
+                });
+
+                //Autocompletar en item
+                var options = {
+                    url: function (phrase) {
+                        return "{% url "get_items_fijos_fk" %}" + "?ph=" + phrase;
+                    },
+
+                    getValue: "fk_display",
+
+                    list: {
+                        onChooseEvent: function () {
+                            var value = $("#id_" + prefix + "-" + formCount + "-item_0").getSelectedItemData().pk;
+                            $("#id_" + prefix + "-" + formCount + "-item_1").val(value).trigger("change");
+                        }
+                    }
+                };
+
+                $("#id_" + prefix + "-" + formCount + "-item_0").easyAutocomplete(options);
+                $("#id_" + prefix + "-" + formCount + "-item_0").on("change", function () {
+                    if ($(this).val() == '') {
+                        $("#id_" + prefix + "-" + formCount + "-item_1").val("").trigger("change");
+                    }
+                });
+
+                // Update the total form count
+                $("#id_" + prefix + "-TOTAL_FORMS").val(formCount + 1);
+                return row;
+            } // End if
+            else {
+                alert("Solo se puede agregar 20 item por factura");
+            }
+        }
+
+        $(document).ready(function () {
+            $("#add_escala").click(function () {
+                addEscala("escala");
+            });
+
+            $("#escala").on('click', ".escala-edit", function () {
+                var regexp = /escala-(\d+)-/;
+                var n = regexp.exec($(this).parents('.escala').find("input:first").attr("name"));
+                editarEscala(n[1]);
+            });
+
+            $("dialog #add-item-energia").on("click", function () {
+                addItemEnergia("energia-" + $(this).attr("data-escala"), false);
+            });
+
+            $("dialog #add-item-fijo").on("click", function () {
+                addItemFijo("fijos-" + $(this).attr("data-escala"), false);
+            });
         });
-        {##}
-        {#            $("#add_item_articulo_compuesto").click(function () {#}
-        {#                addItemArtCompuesto("art_comp", $(this).attr("data-actual_parent"));#}
-        {#            });#}
-        {##}
-        {#            HANDLERS PARA EVENTOS DE DETALLE DE FACTURA#}
-        {#            $("#detalle_factura").on("click", ".denominacion_articulo", function () {#}
-        {#                seleccionarArticuloAlmacenado($(this).parents(".item"));#}
-        {#            });#}
-        {##}
-        {#            $("#detalle_factura").on("click", ".composicion_articulo", function () {#}
-        {#                componerArticulo($(this).parents(".item"));#}
-        {#            });#}
-        {##}
-        {#            // Agrego el handler para borrar, y actualizar los precios#}
-        {#            $("#detalle_factura").on("click", ".delete", function () {#}
-        {#                deleteItemFactura(this, "det_venta");#}
-        {#            });#}
-        {##}
-        {#            $("#detalle_factura").on("change", ".cantidad_input_detalle, .precio_unitario_input_detalle, .descuento_input_detalle", function () {#}
-        {#                actualizarPTItemFactura($(this).parents(".item"));#}
-        {#            });#}
-        {##}
-        {#            $("#detalle_factura").on("change", "select.iva_articulo_personalizado_select_detalle", function () {#}
-        {#                $(this).parents(".item").attr("data-alic", $(this).val());#}
-        {#                actualizarPTItemFactura($(this).parents(".item"));#}
-        {#            });#}
-        {##}
-        {#            $("#id_descuento").on("change", function () {#}
-        {#                actualizarTotalesFactura();#}
-        {#            });#}
-        {##}
-        {#            // Agrego el handler para borrar, y actualizar los precios#}
-        {#            $("#detalle_composicion_articulo").on("click", ".delete", function () {#}
-        {#                var ap = $("#add_item_articulo_compuesto").attr("data-actual_parent")#}
-        {#                deleteItemArtCompuesto(this, "art_comp-" + ap);#}
-        {#            });#}
-        {##}
-        {#            //Evento de cambio de cantidad en art compuesto#}
-        {#            $("#detalle_composicion_articulo").on("change", ".cantidad_input_compuesto, .precio_unitario_input_compuesto", function () {#}
-        {#                actualizarPTArticuloCompuesto($(this).parents(".item_composicion_articulo"));#}
-        {#            });#}
-        {##}
-        {#            $("#detalle_composicion_articulo").on("click", ".denominacion_articulo", function () {#}
-        {#                seleccionarArticuloAlmacenado($(this).parents(".item_composicion_articulo"));#}
-        {#            });#}
-        {##}
-        {#            //METODOS IMPLEMENTADOS EN EL UPDATE DE VENTAS#}
-        {#            if ($("#id_cliente").val() != "") {#}
-        {#                $.ajax({#}
-        {#                    url: "{% url 'get_comprobante_info' %}",#}
-        {##}
-        {#                    data: {id_cliente: $("#id_cliente").val(), tipo: $("#id_tipoDisplay").val()},#}
-        {#                    type: 'GET',#}
-        {#                    dataType: 'json',#}
-        {#                    async: false,#}
-        {##}
-        {#                    success: function (json) {#}
-        {#                        letra = json.letra;#}
-        {#                        $("#info_comprobante").text(json.info);#}
-        {#                    },#}
-        {#                });#}
-        {#                $(".item").each(function () {#}
-        {#                    actualizarPTItemFactura($(this));#}
-        {#                });#}
-        {#            }#}
-        {##}
-        {#            //ACTUALIZO ARRAY DE ITEMS CON COMPUESTOS#}
-        {#            $(".item").each(function () {#}
-        {#                if ($(this).find("select.tipo_articulo_select").val() == "AC") {#}
-        {#                    var regex = /det_venta-(\d+)-/g;#}
-        {#                    var num = regex.exec($(this).find(".articulo_input").attr("id"));#}
-        {#                    items_compuestos[items_compuestos.length] = num[1]#}
-        {#                }#}
-        {#            });#}
-        {##}
-        {##}
-        {#            var validation_config = {#}
-        {#                rules: {#}
-        {#                    clienteDisplay: 'client_valid',#}
-        {#                    'fecha': {#}
-        {#                        required: true,#}
-        {#                        dateITA: true,#}
-        {#                    },#}
-        {#                    'condicion_venta': {#}
-        {#                        required: true,#}
-        {#                    },#}
-        {#                    'descripcion_articulo_compuesto': {#}
-        {#                        required: {#}
-        {#                            depends: function (element) {#}
-        {#                                return !$(element).is(":hidden");#}
-        {#                            }#}
-        {#                        },#}
-        {#                    },#}
-        {#                },#}
-        {#                errorElement: "div",#}
-        {#                errorClass: "error",#}
-        {#                onfocusout: false,#}
-        {#                ignore: "",#}
-        {#                invalidHandler: function () {#}
-        {#                    console.log(valid.numberOfInvalids() + " field(s) are invalid");#}
-        {#                },#}
-        {#                success: ""#}
-        {#            };#}
-        {#            var valid = $("form").validate(validation_config);#}
-        {#            //VALIDACIONES FRONT-END#}
-        {#            // Add custom validation rule#}
-        {#            jQuery.validator.addMethod(#}
-        {#                    'client_valid',#}
-        {#                    function (value, el) {#}
-        {#                        if ($(el).parents("form").find("#id_cliente").val() != "" && value.length > 0) {#}
-        {#                            return true#}
-        {#                        } else {#}
-        {#                            return false#}
-        {#                        }#}
-        {#                    },#}
-        {#                    'Selecciona un cliente valido'#}
-        {#            );#}
-        {#            //GENERATE VALIDATION CLASS, FOR FORMSET FIELDS#}
-        {#            function is_ac(element) {#}
-        {#                var regex = /art_comp-(\d+)-/g;#}
-        {#                var num = regex.exec($(element).attr("id"));#}
-        {#                return $("option:selected", $($(".item")[num[1]]).find(".tipo_articulo_select")).val() == "AC"#}
-        {#            }#}
-        {##}
-        {#            jQuery.validator.addClassRules({#}
-        {#                cantidad_input_detalle: {#}
-        {#                    required: true,#}
-        {#                    number: true#}
-        {#                },#}
-        {#                precio_unitario_input_detalle: {#}
-        {#                    required: true,#}
-        {#                    number: true#}
-        {#                },#}
-        {#                articulo_input_detalle: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            return $("option:selected", $(element).parents(".item").find(".tipo_articulo_select")).val() == 'AA'#}
-        {#                        }#}
-        {#                    }#}
-        {#                },#}
-        {#                linea_articulo_personalizado_select_detalle: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            return $("option:selected", $(element).parents(".item").find(".tipo_articulo_select")).val() == 'AP'#}
-        {#                        }#}
-        {#                    }#}
-        {#                },#}
-        {#                iva_articulo_personalizado_select_detalle: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            return $("option:selected", $(element).parents(".item").find(".tipo_articulo_select")).val() == 'AP'#}
-        {#                        }#}
-        {#                    }#}
-        {#                },#}
-        {#                articulo_personalizado_input_detalle: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            return $("option:selected", $(element).parents(".item").find(".tipo_articulo_select")).val() == 'AP'#}
-        {#                        }#}
-        {#                    }#}
-        {#                },#}
-        {#                cantidad_input_compuesto: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            return is_ac(element)#}
-        {#                        }#}
-        {#                    },#}
-        {#                    number: true#}
-        {#                },#}
-        {#                precio_unitario_input_compuesto: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            return is_ac(element)#}
-        {#                        }#}
-        {#                    },#}
-        {#                    number: true#}
-        {#                },#}
-        {#                articulo_input_compuesto: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            var pers = !$(element).parents(".item_composicion_articulo").find(".pers_checkbox").is(":checked")#}
-        {#                            return pers && is_ac(element)#}
-        {#                        }#}
-        {#                    }#}
-        {#                },#}
-        {#                linea_articulo_personalizado_select_compuesto: {#}
-        {#                    required: false#}
-        {#                },#}
-        {#                iva_articulo_compuesto_select_detalle: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            return $("option:selected", $(element).parents(".item").find(".tipo_articulo_select")).val() == 'AC'#}
-        {#                        }#}
-        {#                    }#}
-        {#                },#}
-        {#                articulo_personalizado_input_compuesto: {#}
-        {#                    required: {#}
-        {#                        depends: function (element) {#}
-        {#                            var pers = $(element).parents(".item_composicion_articulo").find(".pers_checkbox").is(":checked")#}
-        {#                            var regex = /art_comp-(\d+)-/g;#}
-        {#                            var num = regex.exec($(element).attr("id"));#}
-        {#                            var ac = $("option:selected", $($(".item")[num[1]]).find(".tipo_articulo_select")).val() == "AC"#}
-        {#                            return pers && ac#}
-        {#                        }#}
-        {#                    }#}
-        {#                }#}
-        {#            });#}
-        {#        });#}
     </script>
 {% endblock %}

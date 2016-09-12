@@ -15,15 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from django.contrib.auth.decorators import login_required
 
-from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table, get_items_table, get_cesp_table
+from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table, get_items_table, get_cesp_table, \
+    get_items_fijos_fk, get_items_energia_fk, get_items_fijos_req, get_items_energia_req
 from prepapp.views import SociosList, SociosAlta, SociosModificar, TerrenoList, TerrenoAlta, TerrenoModificar, \
-    TarifaList, TarifaAlta, TarifaModificar, CespList, CespAlta, CespModificar, EscalonesEnergiaList, \
-    EscalonesEnergiaAlta, EscalonesEnergiaModificar, sociosSuspender, sociosHabilitar, terrenosSuspender, \
-    terrenosHabilitar, ItemsList, ItemsAlta, ItemsModificar, itemsSuspender, itemsHabilitar
-    sociosSuspender, sociosHabilitar, terrenosSuspender, \
-    terrenosHabilitar, tarifaConfiguracion
+    TarifaList, TarifaAlta, TarifaModificar, CespList, CespAlta, CespModificar, sociosSuspender, sociosHabilitar, \
+    terrenosSuspender, terrenosHabilitar, ItemsList, ItemsAlta, ItemsModificar, itemsSuspender, itemsHabilitar, \
+    sociosSuspender, sociosHabilitar, terrenosSuspender, terrenosHabilitar, tarifaConfiguracion
 
 sociosPatterns = [
     url(r'list/$', SociosList.as_view(), name="SociosList"),
@@ -46,7 +44,7 @@ terrenosPatterns = [
 
 tarifasPatterns = [
     url(r'list/$', TarifaList.as_view(), name="TarifasList"),
-    url(r'new/$', TarifaAlta.as_view(), name="TarifasAlta"),
+    url(r'new/$', tarifaConfiguracion, name="TarifasAlta"),
     url(r'update/(?P<pk>\d+)$', TarifaModificar.as_view(), name="TarifasModificar")
 ]
 
@@ -57,12 +55,6 @@ cespPatterns = [
     url(r'get_cesp_table/$', get_cesp_table, name='get_cesp_table'),
 ]
 
-# escalonesEnergiaPatterns = [
-#     url(r'list/$', EscalonesEnergiaList.as_view(), name="EscalonesEnergiaList"),
-#     url(r'new/$', EscalonesEnergiaAlta.as_view(), name="EscalonesEnergiaAlta"),
-#     url(r'update/(?P<pk>\d+)$', EscalonesEnergiaModificar.as_view(), name="EscalonesEnergiaModificar")
-# ]
-
 itemsPatterns = [
     url(r'list/$', ItemsList.as_view(), name="ItemsList"),
     url(r'new/$', ItemsAlta.as_view(), name="ItemsAlta"),
@@ -70,6 +62,11 @@ itemsPatterns = [
     url(r'get_items_table/$', get_items_table, name='get_items_table'),
     url(r'suspender/(?P<pk>\d+)$', itemsSuspender, name='ItemsSuspender'),
     url(r'habilitar/(?P<pk>\d+)$', itemsHabilitar, name='ItemsHabilitar'),
+    url(r'get_items_fijos_fk/$', get_items_fijos_fk, name='get_items_fijos_fk'),
+    url(r'get_items_energia_fk/$', get_items_energia_fk, name='get_items_energia_fk'),
+    url(r'get_items_fijos_req/$', get_items_fijos_req, name='get_items_fijos_req'),
+    url(r'get_items_energia_req/$', get_items_energia_req, name='get_items_energia_req'),
+
 ]
 
 urlpatterns = [
@@ -78,7 +75,5 @@ urlpatterns = [
     url(r'^terrenos/', include(terrenosPatterns)),
     url(r'^tarifas/', include(tarifasPatterns)),
     url(r'^cesp/', include(cespPatterns)),
-    # url(r'^escalones/', include(escalonesEnergiaPatterns))
-    url(r'^escalones/', include(escalonesEnergiaPatterns)),
     url(r'^items/', include(itemsPatterns))
 ]
