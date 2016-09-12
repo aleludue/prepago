@@ -27,6 +27,48 @@ def get_socios_fk(request):
     s.seek(0)
     return HttpResponse(s.read())
 
+def get_items_fijos_fk(request):
+    phrase = request.GET['ph']
+    items_qs = Items.objects.filter(nombre__icontains=phrase, aplicacion='CF', requerido=False)
+    items = []
+    for item in items_qs:
+        items.append({'fk_display': item.nombre, 'pk': item.pk})
+    s = StringIO()
+    json.dump(items, s)
+    s.seek(0)
+    return HttpResponse(s.read())
+
+def get_items_energia_fk(request):
+    phrase = request.GET['ph']
+    items_qs = Items.objects.filter(nombre__icontains=phrase, aplicacion='EN', requerido=False)
+    items = []
+    for item in items_qs:
+        items.append({'fk_display': item.nombre, 'pk': item.pk})
+    s = StringIO()
+    json.dump(items, s)
+    s.seek(0)
+    return HttpResponse(s.read())
+
+def get_items_fijos_req(request):
+    items_qs = Items.objects.filter(aplicacion='CF', requerido=True)
+    items = []
+    for item in items_qs:
+        items.append({'nombre': item.nombre, 'pk': item.pk})
+    s = StringIO()
+    json.dump(items, s)
+    s.seek(0)
+    return HttpResponse(s.read())
+
+def get_items_energia_req(request):
+    items_qs = Items.objects.filter(aplicacion='EN', requerido=True)
+    items = []
+    for item in items_qs:
+        items.append({'nombre': item.nombre, 'pk': item.pk})
+    s = StringIO()
+    json.dump(items, s)
+    s.seek(0)
+    return HttpResponse(s.read())
+
 
 def _getattr_foreingkey(obj, attr):
     pt = attr.count('.')
@@ -225,9 +267,9 @@ def get_terrenos_table(request):
 def get_items_table(request):
     # SETEOS INICIALES
     objects = Items.objects.all()
-    list_display = ['nombre', 'tipo', 'aplicacion', 'valor']
+    list_display = ['nombre', 'tipo', 'aplicacion']
     list_global_search = ['nombre']
-    data_struct = {0: 'nombre', 1: 'tipo', 2: 'aplicacion', 3: 'valor'}
+    data_struct = {0: 'nombre', 1: 'tipo', 2: 'aplicacion'}
 
     # Cuenta total de articulos:
     recordsTotal = objects.count()

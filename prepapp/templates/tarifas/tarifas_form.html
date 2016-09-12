@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block siteTitle %}
     Sistema de Energia Prepaga - Tarifas
@@ -8,23 +9,482 @@
     Gestión de Tarifas
 {% endblock %}
 
+{% block headExtras %}
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/jquery.easy-autocomplete.min.js"></script>
+    <link rel="stylesheet" href="{% static "eac-mdl.css" %}">
+{% endblock %}
+
 {% block pageContent %}
     <div class="mdl-grid">
         <div class="mdl-cell--2-col"></div>
         <div class="mdl-cell--8-col">
             <form method="post" autocomplete="off" novalidate>{% csrf_token %}
-                    {{ form.as_mdl }}
+                <dialog class="mdl-dialog" style="width: 60%;">
+                    {{ itemsEnergia.management_form }}
+                    {{ itemsFijos.management_form }}
+                    <h5 class="mdl-dialog__title">Modificación de escala</h5>
+                    <div class="mdl-dialog__content">
+                        <div class="mdl-grid">
+                            <div class="mdl-cell--12-col">
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell">
+                                        <p>Items Energía</p>
+                                    </div>
+                                </div>
+                                <table id="tabla-energia" class="mdl-data-table mdl-js-data-table" width="100%">
+                                    <thead>
+                                    <td>Item</td>
+                                    <td>IVA</td>
+                                    <td>Valor</td>
+                                    </thead>
+                                    <tbody>
+                                    {% for itemEnergia in itemsEnergia %}
+                                        <tr data-req="true" class="item-energia">
+                                            <td>{{ itemEnergia.item }}
+                                                <script>
+                                                    var options = {
+                                                        url: function (phrase) {
+                                                            return "{% url "get_items_energia_fk" %}" + "?ph=" + phrase;
+                                                        },
+
+                                                        getValue: "fk_display",
+
+                                                        list: {
+                                                            onChooseEvent: function () {
+                                                                var value = $("#id_energia-0-0-item_0").getSelectedItemData().pk;
+                                                                $("#id_energia-0-0-item_1").val(value).trigger("change");
+                                                            }
+                                                        }
+                                                    };
+
+                                                    $("#id_energia-0-0-item_0").easyAutocomplete(options);
+                                                    $("#id_energia-0-0-item_0").on("change", function () {
+                                                        if ($(this).val() == '') {
+                                                            $("#id_energia-0-0-item_1").val("").trigger("change");
+                                                        }
+                                                    });
+                                                </script>
+                                            </td>
+                                            <td>{{ itemEnergia.iva }}</td>
+                                            <td>{{ itemEnergia.valor }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr id="item-energia-empty" data-req="false" style="display: none;">
+                                        <td>{{ itemsEnergia.empty_form.item }}</td>
+                                        <td>{{ itemsEnergia.empty_form.iva }}</td>
+                                        <td>{{ itemsEnergia.empty_form.valor }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell--1-col">
+                                        <button type="button" id="add-item-energia" data-escala="-1"
+                                        class="btn teal darken-1"><i
+                                            class="material-icons">add</i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell">
+                                        <p>Items Fijos</p>
+                                    </div>
+                                </div>
+                                <table id="tabla-fijo" class="mdl-data-table mdl-js-data-table" width="100%">
+                                    <thead>
+                                    <td>Item</td>
+                                    <td>IVA</td>
+                                    <td>Valor</td>
+                                    </thead>
+                                    <tbody>
+                                    {% for itemFijo in itemsFijos %}
+                                        <tr data-req="true" class="item-fijo">
+                                            <td>{{ itemFijo.item }}
+                                                <script>
+                                                    var options = {
+                                                        url: function (phrase) {
+                                                            return "{% url "get_items_fijos_fk" %}" + "?ph=" + phrase;
+                                                        },
+
+                                                        getValue: "fk_display",
+
+                                                        list: {
+                                                            onChooseEvent: function () {
+                                                                var value = $("#id_fijos-0-0-item_0").getSelectedItemData().pk;
+                                                                $("#id_fijos-0-0-item_1").val(value).trigger("change");
+                                                            }
+                                                        }
+                                                    };
+
+                                                    $("#id_fijos-0-0-item_0").easyAutocomplete(options);
+                                                    $("#id_fijos-0-0-item_0").on("change", function () {
+                                                        if ($(this).val() == '') {
+                                                            $("#id_fijos-0-0-item_1").val("").trigger("change");
+                                                        }
+                                                    });
+                                                </script>
+                                            </td>
+                                            <td>{{ itemFijo.iva }}</td>
+                                            <td>{{ itemFijo.valor }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr id="item-fijo-empty" data-req="false" style="display: none;">
+                                        <td>{{ itemsFijos.empty_form.item }}</td>
+                                        <td>{{ itemsFijos.empty_form.iva }}</td>
+                                        <td>{{ itemsFijos.empty_form.valor }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mdl-grid">
+                                    <div class="mdl-cell--1-col">
+                                        <button type="button" id="add-item-fijo" data-escala="-1"
+                                                class="btn teal darken-1"><i
+                                                class="material-icons">add</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-dialog__actions">
+                        <button type="button"
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent close">
+                            Cerrar
+                        </button>
+                    </div>
+                </dialog>
+
+                <div class="mdl-grid">
+                    <div class="mdl-cell--6-col mdl-cell--2-offset">
+                        <div class="mdl-textfield mdl-js-textfield">
+                            {{ tarifaForm.nombre }}
+                            {{ tarifaForm.nombre.label_tag }}
+                        </div>
+                    </div>
+                </div>
                 <div class="mdl-grid">
                     <div class="mdl-cell--12-col">
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" type="submit">Aceptar<i
+                        {{ escalasFormset.management_form }}
+                        <table id="escala" width="100%" class="mdl-data-table mdl-js-data-table">
+                            <thead>
+                            <tr>
+                                <th style="text-align: center">Desde</th>
+                                <th style="text-align: center">Hasta</th>
+                                <th style="text-align: center">Detalle</th>
+                                <th style="text-align: center"></th>
+                                <th style="text-align: center"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for escala in escalasFormset.forms %}
+                                <tr class="escala">
+                                    <td class="columna_desde">
+                                        {{ escala.desde }}
+                                    </td>
+                                    <td class="columna_hasta">
+                                        {{ escala.hasta }}
+                                    </td>
+                                    <td class="columna_detalle">
+
+                                    </td>
+                                    <td>
+                                        <span class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored escala-edit">
+                                            <i class="material-icons">mode_edit</i>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored escala-delete">
+                                            <i class="material-icons">delete</i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            <tr id="escala-empty" style="display: none;">
+                                <td class="columna_desde">
+                                    {{ escalasFormset.empty_form.desde }}
+                                </td>
+                                <td class="columna_hasta">
+                                    {{ escalasFormset.empty_form.hasta }}
+                                </td>
+                                <td class="columna_detalle">
+
+                                </td>
+                                <td>
+                                    <span class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored escala-edit">
+                                        <i class="material-icons">mode_edit</i>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored escala-delete">
+                                        <i class="material-icons">delete</i>
+                                    </span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="mdl-grid">
+                    <div class="mdl-cell--1-col">
+                        <button type="button" id="add_escala" class="btn teal darken-1"><i
+                                class="material-icons">add</i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mdl-grid">
+                    <div class="mdl-cell--12-col">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                type="submit">Aceptar<i
                                 class="material-icons">send</i></button>
-                        <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" type="reset" value="Deshacer cambios"/>
-                        <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" type="button" value="Cancelar"
+                        <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" type="reset"
+                               value="Deshacer cambios"/>
+                        <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" type="button"
+                               value="Cancelar"
                                onclick="history.back()">
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <script>
+        function updateElementIndex(el, prefix, ndx) {
+            var id_regex = new RegExp('(' + prefix + '-__prefix__-)');
+            var replacement = prefix + '-' + ndx + '-';
+            if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex,
+                    replacement));
+            if (el.id) el.id = el.id.replace(id_regex, replacement);
+            if (el.name) el.name = el.name.replace(id_regex, replacement);
+        }
 
+        function updateElementCompIndex(el, prefix, ndx) {
+            var regpre = /(\w+)-(\d+)/.exec(prefix);
+            var id_regex = new RegExp('(' + regpre[1] + '-0-__prefix__-)');
+            var replacement = regpre[1] + '-' + regpre[2] + '-' + ndx + '-';
+            if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex,
+                    replacement));
+            if (el.id) el.id = el.id.replace(id_regex, replacement);
+            if (el.name) el.name = el.name.replace(id_regex, replacement);
+        }
+
+        function addEscala(prefix) {
+            function addMGMForm(prefix) {
+                var t = prefix;
+                $("<input>", {
+                    id: "id_" + t + "-TOTAL_FORMS",
+                    name: t + "-TOTAL_FORMS",
+                    type: "hidden",
+                    value: 0
+                }).appendTo("dialog");
+                $("<input>", {
+                    id: "id_" + t + "-TOTAL_FORMS",
+                    name: t + "-INITIAL_FORMS",
+                    type: "hidden",
+                    value: 0
+                }).appendTo("dialog");
+                $("<input>", {
+                    id: "id_" + t + "-TOTAL_FORMS",
+                    name: t + "-MIN_NUM_FORMS",
+                    type: "hidden",
+                    value: 0
+                }).appendTo("dialog");
+                $("<input>", {
+                    id: "id_" + t + "-TOTAL_FORMS",
+                    name: t + "-MAX_NUM_FORMS",
+                    type: "hidden",
+                    value: 1000
+                }).appendTo("dialog");
+            }
+
+            var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+            if (formCount < 20) {
+                // Insert it after the last form
+                var row = $("#escala-empty").clone()
+                        .removeAttr('style')
+                        .removeAttr('id')
+                        .addClass('escala')
+                        .insertAfter("#escala tbody tr:nth-last-child(2)")
+                        .slideDown(300);
+
+                // Relabel or rename all the relevant bits
+                $(row).children().children().each(function () {
+                    updateElementIndex(this, prefix, formCount);
+                    $(this).val("");
+                    $(this).removeAttr('value');
+                });
+
+                // Update the total form count
+                $("#id_" + prefix + "-TOTAL_FORMS").val(formCount + 1);
+
+                //Agrego nuevo mgm_form
+                addMGMForm("fijos-" + formCount);
+                addMGMForm("energia-" + formCount);
+
+                //Agrego los items requeridos
+                $.get("{% url "get_items_fijos_req" %}", function (json) {
+                    var items = JSON.parse(json);
+                    console.log(items);
+                    items.forEach(function (item) {
+                        var row = addItemFijo("fijos-" + formCount, true);
+                        $(row).find('.fijos-item[name$="_0"]').val(item.nombre);
+                        $(row).find('.fijos-item[name$="_1"]').val(item.pk);
+                    });
+                });
+                //Agrego los items requeridos
+                $.get("{% url "get_items_energia_req" %}", function (json) {
+                    var items = JSON.parse(json);
+                    console.log(items);
+                    items.forEach(function (item) {
+                        var row = addItemEnergia("energia-" + formCount, true);
+                        $(row).find('.energia-item[name$="_0"]').val(item.nombre);
+                        $(row).find('.energia-item[name$="_1"]').val(item.pk);
+                    });
+                });
+
+            } // End if
+            else {
+                alert("Solo se puede agregar 20 item por factura");
+            }
+        }
+
+        function editarEscala(n_escala) {
+            var dialog = document.querySelector('dialog');
+            if (!dialog.showModal) {
+                dialogPolyfill.registerDialog(dialog);
+            }
+            $('dialog tbody tr').hide();
+            $('dialog .energia-item[name*="energia-' + n_escala + '-"]').each(function () {
+                $(this).parents(".item-energia").show();
+            });
+            $("dialog #add-item-energia").attr("data-escala", n_escala);
+            $('dialog .fijos-item[name*="fijos-' + n_escala + '-"]').each(function () {
+                $(this).parents(".item-fijo").show();
+            });
+            $("dialog #add-item-fijo").attr("data-escala", n_escala);
+            dialog.showModal();
+            dialog.querySelector('.close').addEventListener('click', function () {
+                dialog.close();
+            });
+        }
+
+        function addItemEnergia(prefix) {
+            var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+            if (formCount < 20) {
+                // Insert it after the last form
+                var row = $("#item-energia-empty").clone()
+                        .removeAttr('style')
+                        .removeAttr('id')
+                        .addClass('item-energia')
+                        .insertAfter("#tabla-energia tbody tr:nth-last-child(2)")
+                        .slideDown(300);
+
+                // Relabel or rename all the relevant bits
+                $(row).children().children().each(function () {
+                    updateElementCompIndex(this, prefix, formCount);
+                    $(this).val("");
+                    $(this).removeAttr('value');
+                });
+
+                //Autocompletar en item
+                var options = {
+                    url: function (phrase) {
+                        return "{% url "get_items_energia_fk" %}" + "?ph=" + phrase;
+                    },
+
+                    getValue: "fk_display",
+
+                    list: {
+                        onChooseEvent: function () {
+                            var value = $("#id_" + prefix + "-" + formCount + "-item_0").getSelectedItemData().pk;
+                            $("#id_" + prefix + "-" + formCount + "-item_1").val(value).trigger("change");
+                        }
+                    }
+                };
+
+                $("#id_" + prefix + "-" + formCount + "-item_0").easyAutocomplete(options);
+                $("#id_" + prefix + "-" + formCount + "-item_0").on("change", function () {
+                    if ($(this).val() == '') {
+                        $("#id_" + prefix + "-" + formCount + "-item_1").val("").trigger("change");
+                    }
+                });
+
+                // Update the total form count
+                $("#id_" + prefix + "-TOTAL_FORMS").val(formCount + 1);
+                return row;
+            } // End if
+            else {
+                alert("Solo se puede agregar 20 item por factura");
+            }
+        }
+
+        function addItemFijo(prefix, req) {
+            var formCount = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+            if (formCount < 20) {
+                // Insert it after the last form
+                var row = $("#item-fijo-empty").clone()
+                        .removeAttr('style')
+                        .removeAttr('id')
+                        .addClass('item-fijo')
+                        .attr("data-req", String(req))
+                        .insertAfter("#tabla-fijo tbody tr:nth-last-child(2)")
+                        .slideDown(300);
+
+                // Relabel or rename all the relevant bits
+                $(row).children().children().each(function () {
+                    updateElementCompIndex(this, prefix, formCount);
+                    $(this).val("");
+                    $(this).removeAttr('value');
+                });
+
+                //Autocompletar en item
+                var options = {
+                    url: function (phrase) {
+                        return "{% url "get_items_fijos_fk" %}" + "?ph=" + phrase;
+                    },
+
+                    getValue: "fk_display",
+
+                    list: {
+                        onChooseEvent: function () {
+                            var value = $("#id_" + prefix + "-" + formCount + "-item_0").getSelectedItemData().pk;
+                            $("#id_" + prefix + "-" + formCount + "-item_1").val(value).trigger("change");
+                        }
+                    }
+                };
+
+                $("#id_" + prefix + "-" + formCount + "-item_0").easyAutocomplete(options);
+                $("#id_" + prefix + "-" + formCount + "-item_0").on("change", function () {
+                    if ($(this).val() == '') {
+                        $("#id_" + prefix + "-" + formCount + "-item_1").val("").trigger("change");
+                    }
+                });
+
+                // Update the total form count
+                $("#id_" + prefix + "-TOTAL_FORMS").val(formCount + 1);
+                return row;
+            } // End if
+            else {
+                alert("Solo se puede agregar 20 item por factura");
+            }
+        }
+
+        $(document).ready(function () {
+            $("#add_escala").click(function () {
+                addEscala("escala");
+            });
+
+            $("#escala").on('click', ".escala-edit", function () {
+                var regexp = /escala-(\d+)-/;
+                var n = regexp.exec($(this).parents('.escala').find("input:first").attr("name"));
+                editarEscala(n[1]);
+            });
+
+            $("dialog #add-item-energia").on("click", function () {
+                addItemEnergia("energia-" + $(this).attr("data-escala"), false);
+            });
+
+            $("dialog #add-item-fijo").on("click", function () {
+                addItemFijo("fijos-" + $(this).attr("data-escala"), false);
+            });
+        });
+    </script>
 {% endblock %}

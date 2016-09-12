@@ -1,11 +1,9 @@
 from django import forms
 from django.db import models
-from django.db.models.fields import DateField
 from django.forms import widgets
-from django.forms.extras.widgets import SelectDateWidget
-from django.utils import timezone
+from django.forms.fields import CharField
 
-from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Items, Cesp
+from prepapp.models import Socio, Terreno, Tarifa, Escalones, Items, Cesp, AsociacionItemAgrupacion
 
 
 def charfield_handler(field):
@@ -34,7 +32,7 @@ class AutoCompleteFKMultiWidget(widgets.MultiWidget):
     def decompress(self, value):
         if value:
             obj = self.choices.queryset.model.objects.get(pk=value)
-            return [getattr(obj, self.dict_pk_search[self.choices.queryset.model]), obj.pk]
+            return [getattr(obj, self.choices.queryset.model.fk_fields[0]), obj.pk]
         else:
             return [None, None]
 
@@ -85,8 +83,6 @@ def customize_field(field):
         return CharFieldMDL(max_length=field.max_length, help_text=field.help_text)
     elif isinstance(field, models.PositiveIntegerField) or isinstance(field, models.IntegerField):
         return IntegerFieldMDL(localize=False, help_text=field.help_text)
-    elif isinstance(field, models.DateField):
-        return forms.DateField(widget=SelectDateWidget(), initial=timezone.now(), help_text=field.help_text)
     elif isinstance(field, models.ForeignKey):
         return AutoCompleteMDLFKField(queryset=field.rel.to.objects.all())
     else:
@@ -142,12 +138,10 @@ class TerrenosForm(MDLBaseModelForm):
 
     class Meta:
         model = Terreno
-        fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua', 'tarifa']
-        # Para Campo FK personalizado con AutoComplete, se usa en UpdateView, debe devolver lo mismo que en la vista api del AC
-        pk_socios_fields = ['nombre']
+        fields = ['socio', 'nroTerreno', 'domicilio', 'condicionIva', 'nroMedidorEnergia', 'cargoConsumoAgua']
 
 
-class TarifasForm(MDLBaseModelForm):
+class TarifaForm(MDLBaseModelForm):
     formfield_callback = customize_field
 
     class Meta:
@@ -155,20 +149,40 @@ class TarifasForm(MDLBaseModelForm):
         fields = ['nombre']
 
 
-class EscalonesEnergiaForm(MDLBaseModelForm):
-    formfield_callback = customize_field
+class EscalasForm(forms.Form):
+    desde = forms.IntegerField()
+    hasta = forms.IntegerField()
 
-    class Meta:
-        model = EscalonesEnergia
-        fields = ['tarifa', 'desde', 'hasta', 'valor']
+
+class ItemsEnergiaForm(forms.Form):
+    item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='EN'),
+                                  widget=AutoCompleteFKMultiWidget(attrs={'class': 'energia-item'}))
+    iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES,
+                            widget=forms.Select(attrs={'class': 'energia-iva'}))
+    valor = forms.DecimalField(max_digits=5, widget=forms.TextInput(attrs={'class': 'energia-valor'}))
+    escala = forms.IntegerField(widget=forms.HiddenInput())
+
+
+class ItemsFijoForm(forms.Form):
+    item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='CF'),
+                                  widget=AutoCompleteFKMultiWidget(attrs={'class': 'fijos-item'}))
+    iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES,
+                            widget=forms.Select(attrs={'class': 'fijos-iva'}))
+    valor = forms.DecimalField(max_digits=5, widget=forms.TextInput(attrs={'class': 'energia-valor'}))
+    escala = forms.IntegerField(widget=forms.HiddenInput())
+
+
+class EscalonesForm(forms.Form):
+    item = forms.IntegerField(widget=forms.HiddenInput())
+    desde = forms.IntegerField()
+    hasta = forms.IntegerField()
+    valor = forms.DecimalField(decimal_places=5)
 
 
 class ItemsForm(MDLBaseModelForm):
-    formfield_callback = customize_field
-
     class Meta:
         model = Items
-        fields = ['nombre', 'tipo', 'aplicacion', 'valor']
+        fields = ['nombre', 'tipo', 'aplicacion', 'servicios', 'base']
 
 
 class CespForm(MDLBaseModelForm):

@@ -1,0 +1,38 @@
+[
+  {
+    "model": "prepapp.Items",
+    "pk": 1,
+    "fields": {
+      "nombre": "CF Energia",
+      "tipo": "FIJ",
+      "aplicacion": "CF",
+      "servicios": "ENER",
+      "base": true,
+      "requerido": true
+    }
+  },
+  {
+    "model": "prepapp.Items",
+    "pk": 2,
+    "fields": {
+      "nombre": "Energia",
+      "tipo": "ESC",
+      "aplicacion": "EN",
+      "servicios": "ENER",
+      "base": true,
+      "requerido": true
+    }
+  },
+  {
+    "model": "prepapp.Items",
+    "pk": 3,
+    "fields": {
+      "nombre": "ERSEP Norte y Noroeste",
+      "tipo": "ESC",
+      "aplicacion": "EN",
+      "servicios": "ENER",
+      "base": true,
+      "requerido": true
+    }
+  }
+]

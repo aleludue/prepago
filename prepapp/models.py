@@ -9,6 +9,7 @@ from django.utils import timezone
 
 class Socio(models.Model):
     fk_fields = ('nroSocio', 'razonSocial')
+
     LOCALIDAD_CHOICES = ((1, 'Brinkmann'),
                          (2, 'Seeber'),
                          (3, 'Col. Vignaud'))
@@ -65,48 +66,61 @@ class RecambioMedidor(models.Model):
 class Tarifa(models.Model):
     nombre = models.CharField(max_length=30, help_text="Nombre de la tarifa.")
 
+
     def __unicode__(self):
         return self.nombre
 
-
-class EscalonesEnergia(models.Model):
-    tarifa = models.ForeignKey(Tarifa, help_text="Tarifa a la que se aplicara el escalon energetico.")
-    desde = models.IntegerField(help_text="Valor base del escalon.")
-    hasta = models.IntegerField(help_text="Valor final del escalon.")
-    valor = models.FloatField(help_text="Costo en pesos de los intervalos ingresados en el escalon.")
-
-    def __unicode__(self):
-        return '%s - %s a %s' % (self.tarifa, self.desde, self.hasta)
-
+class AgrupacionDeItems(models.Model):
+    tarifa = models.ForeignKey(Tarifa, help_text="Tarifa asociada a esta agrupacion")
+    desde = models.IntegerField()
+    hasta = models.IntegerField()
 
 class Items(models.Model):
+    fk_fields = ('nombre',)
     TIPOS_CHOICES = (('FIJ', 'Fijo'),
-                     ('VAR', 'Variable'))
+                     ('VAR', 'Variable'),
+                     ('ESC', 'Escalonado'))
 
     APLICACION_CHOICES = (('CF', 'Cargo Fijo'),
                           ('EN', 'Energia'))
 
-    nombre = models.CharField(max_length=60, help_text="Nombre del item")
-    tipo = models.CharField(max_length=3, choices=TIPOS_CHOICES, help_text="Tipo de valor del item, porcentual o fijo")
-    aplicacion = models.CharField(max_length=2, choices=APLICACION_CHOICES, help_text="Área de aplicación del item")
-    valor = models.FloatField(help_text="Valor del item")
-    tarifa = models.ManyToManyField(Tarifa, through='Gravamen')
+    SERVICIOS = (('ENER', 'Energia Eléctrica'),
+                 ('AGUA', 'Agua Corriente'),
+                 ('CLOA', 'Cloacas'),
+                 ('SERV', 'Servicios Sociales'),
+                 ('ACUE', 'A cuenta de terceros'))
+
+    nombre = models.CharField(max_length=60)
+    tipo = models.CharField(max_length=3, choices=TIPOS_CHOICES)
+    aplicacion = models.CharField(max_length=2, choices=APLICACION_CHOICES)
+    tarifa = models.ManyToManyField(AgrupacionDeItems, through='AsociacionItemAgrupacion')
+    servicios = models.CharField(max_length=4, choices=SERVICIOS)
     activo = models.BooleanField(default=True)
+    base = models.BooleanField(default=False)
+    requerido = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.nombre
 
-
-class Gravamen(models.Model):
+class AsociacionItemAgrupacion(models.Model):
     IVA_CHOICES = (('IVA21', 'IVA 21%'),
                    ('IVA27', 'IVA 27%'),
                    ('NOGRA', 'No Gravado'),
                    ('EXENT', 'Exento'))
 
-    tarifa = models.ForeignKey(Tarifa)
+    agrupacion = models.ForeignKey(AgrupacionDeItems)
     item = models.ForeignKey(Items)
     iva = models.CharField(max_length=5, choices=IVA_CHOICES)
+    valor = models.DecimalField(max_digits=10, decimal_places=5)
 
+class Escalones(models.Model):
+    asociacion = models.ForeignKey(AsociacionItemAgrupacion, help_text="Asociacion a la que se aplicara el escalon.")
+    desde = models.IntegerField(help_text="Valor base del escalon.")
+    hasta = models.IntegerField(help_text="Valor final del escalon.")
+    valor = models.FloatField(help_text="Costo en pesos de los intervalos ingresados en el escalon.")
+
+    def __unicode__(self):
+        return '%s - %s a %s' % (self.item, self.desde, self.hasta)
 
 class Cesp(models.Model):
     nroCesp = models.CharField(unique=True, max_length=50, help_text="Número de CESP.")

@@ -12,6 +12,23 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='AgrupacionDeItems',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('desde', models.IntegerField()),
+                ('hasta', models.IntegerField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='AsociacionItemAgrupacion',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('iva', models.CharField(max_length=5, choices=[('IVA21', 'IVA 21%'), ('IVA27', 'IVA 27%'), ('NOGRA', 'No Gravado'), ('EXENT', 'Exento')])),
+                ('valor', models.DecimalField(max_digits=10, decimal_places=5)),
+                ('agrupacion', models.ForeignKey(to='prepapp.AgrupacionDeItems')),
+            ],
+        ),
+        migrations.CreateModel(
             name='Cesp',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -20,12 +37,13 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='EscalonesEnergia',
+            name='Escalones',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('desde', models.IntegerField(help_text='Valor base del escalon.')),
                 ('hasta', models.IntegerField(help_text='Valor final del escalon.')),
                 ('valor', models.FloatField(help_text='Costo en pesos de los intervalos ingresados en el escalon.')),
+                ('asociacion', models.ForeignKey(help_text='Asociacion a la que se aplicara el escalon.', to='prepapp.AsociacionItemAgrupacion')),
             ],
         ),
         migrations.CreateModel(
@@ -45,21 +63,17 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Gravamen',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('iva', models.CharField(max_length=5, choices=[('IVA21', 'IVA 21%'), ('IVA27', 'IVA 27%'), ('NOGRA', 'No Gravado'), ('EXENT', 'Exento')])),
-            ],
-        ),
-        migrations.CreateModel(
             name='Items',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('nombre', models.CharField(help_text='Nombre del item', max_length=60)),
-                ('tipo', models.CharField(help_text='Tipo de valor del item, porcentual o fijo', max_length=3, choices=[('FIJ', 'Fijo'), ('VAR', 'Variable')])),
-                ('aplicacion', models.CharField(help_text='\xc1rea de aplicaci\xf3n del item', max_length=2, choices=[('CF', 'Cargo Fijo'), ('EN', 'Energia')])),
-                ('valor', models.FloatField(help_text='Valor del item')),
+                ('nombre', models.CharField(max_length=60)),
+                ('tipo', models.CharField(max_length=3, choices=[('FIJ', 'Fijo'), ('VAR', 'Variable'), ('ESC', 'Escalonado')])),
+                ('aplicacion', models.CharField(max_length=2, choices=[('CF', 'Cargo Fijo'), ('EN', 'Energia')])),
+                ('servicios', models.CharField(max_length=4, choices=[('ENER', 'Energia El\xe9ctrica'), ('AGUA', 'Agua Corriente'), ('CLOA', 'Cloacas'), ('SERV', 'Servicios Sociales'), ('ACUE', 'A cuenta de terceros')])),
                 ('activo', models.BooleanField(default=True)),
+                ('base', models.BooleanField(default=False)),
+                ('requerido', models.BooleanField(default=False)),
+                ('tarifa', models.ManyToManyField(to='prepapp.AgrupacionDeItems', through='prepapp.AsociacionItemAgrupacion')),
             ],
         ),
         migrations.CreateModel(
@@ -110,21 +124,6 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to='prepapp.Terreno'),
         ),
         migrations.AddField(
-            model_name='items',
-            name='tarifa',
-            field=models.ManyToManyField(to='prepapp.Tarifa', through='prepapp.Gravamen'),
-        ),
-        migrations.AddField(
-            model_name='gravamen',
-            name='item',
-            field=models.ForeignKey(to='prepapp.Items'),
-        ),
-        migrations.AddField(
-            model_name='gravamen',
-            name='tarifa',
-            field=models.ForeignKey(to='prepapp.Tarifa'),
-        ),
-        migrations.AddField(
             model_name='factura_items',
             name='item',
             field=models.ForeignKey(to='prepapp.Items'),
@@ -150,8 +149,13 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to='prepapp.Tarifa'),
         ),
         migrations.AddField(
-            model_name='escalonesenergia',
+            model_name='asociacionitemagrupacion',
+            name='item',
+            field=models.ForeignKey(to='prepapp.Items'),
+        ),
+        migrations.AddField(
+            model_name='agrupaciondeitems',
             name='tarifa',
-            field=models.ForeignKey(help_text='Tarifa a la que se aplicara el escalon energetico.', to='prepapp.Tarifa'),
+            field=models.ForeignKey(help_text='Tarifa asociada a esta agrupacion', to='prepapp.Tarifa'),
         ),
     ]

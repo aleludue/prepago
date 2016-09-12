@@ -29,7 +29,6 @@
             <td>Nombre</td>
             <td>Tipo</td>
             <td>Aplicación</td>
-            <td>Valor</td>
             <td style="width: 20px;"></td>
             <td style="width: 20px;"></td>
         </tr>
@@ -41,12 +40,12 @@
             var tabla_items = $('#items').DataTable({
                 "columnDefs": [
                     {
-                        "targets": [4, 5],
+                        "targets": [3, 4],
                         "orderable": false,
                         "className": "datatables-mdl--action-col"
                     },
                     {
-                        "targets": [0,1,2,3,4,5],
+                        "targets": [0,1,2,3,4],
                         "className": "mdl-data-table__cell--non-numeric"
                     }],
                 "ajax": "{% url "get_items_table" %}",
