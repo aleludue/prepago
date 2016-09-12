@@ -1,6 +1,9 @@
 from django import forms
 from django.db import models
+from django.db.models.fields import DateField
 from django.forms import widgets
+from django.forms.extras.widgets import SelectDateWidget
+from django.utils import timezone
 
 from prepapp.models import Socio, Terreno, Tarifa, EscalonesEnergia, Items, Cesp
 
@@ -82,6 +85,8 @@ def customize_field(field):
         return CharFieldMDL(max_length=field.max_length, help_text=field.help_text)
     elif isinstance(field, models.PositiveIntegerField) or isinstance(field, models.IntegerField):
         return IntegerFieldMDL(localize=False, help_text=field.help_text)
+    elif isinstance(field, models.DateField):
+        return forms.DateField(widget=SelectDateWidget(), initial=timezone.now(), help_text=field.help_text)
     elif isinstance(field, models.ForeignKey):
         return AutoCompleteMDLFKField(queryset=field.rel.to.objects.all())
     else:
