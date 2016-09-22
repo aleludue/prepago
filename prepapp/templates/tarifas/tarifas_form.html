@@ -20,7 +20,7 @@
         <div class="mdl-cell--2-col"></div>
         <div class="mdl-cell--8-col">
             <form method="post" autocomplete="off" novalidate>{% csrf_token %}
-                <dialog class="mdl-dialog" style="width: 60%;">
+                <dialog class="mdl-dialog" style="width: 40%;">
                     {{ itemsEnergia.management_form }}
                     {{ itemsFijos.management_form }}
                     <h5 class="mdl-dialog__title">Modificación de escala</h5>
@@ -34,14 +34,13 @@
                                 </div>
                                 <table id="tabla-energia" class="mdl-data-table mdl-js-data-table" width="100%">
                                     <thead>
-                                    <td>Item</td>
-                                    <td>IVA</td>
+                                    <td class="mdl-data-table__cell--non-numeric">Item</td>
                                     <td>Valor</td>
                                     </thead>
                                     <tbody>
                                     {% for itemEnergia in itemsEnergia %}
-                                        <tr data-req="true" class="item-energia">
-                                            <td>{{ itemEnergia.item }}
+                                        <tr data-req="true" class="item-energia mdl-data-table__cell--non-numeric">
+                                            <td class="mdl-data-table__cell--non-numeric">{{ itemEnergia.item }}
                                                 <script>
                                                     var options = {
                                                         url: function (phrase) {
@@ -66,13 +65,11 @@
                                                     });
                                                 </script>
                                             </td>
-                                            <td>{{ itemEnergia.iva }}</td>
                                             <td>{{ itemEnergia.valor }}</td>
                                         </tr>
                                     {% endfor %}
                                     <tr id="item-energia-empty" data-req="false" style="display: none;">
-                                        <td>{{ itemsEnergia.empty_form.item }}</td>
-                                        <td>{{ itemsEnergia.empty_form.iva }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ itemsEnergia.empty_form.item }}</td>
                                         <td>{{ itemsEnergia.empty_form.valor }}</td>
                                     </tr>
                                     </tbody>
@@ -92,14 +89,13 @@
                                 </div>
                                 <table id="tabla-fijo" class="mdl-data-table mdl-js-data-table" width="100%">
                                     <thead>
-                                    <td>Item</td>
-                                    <td>IVA</td>
+                                    <td class="mdl-data-table__cell--non-numeric">Item</td>
                                     <td>Valor</td>
                                     </thead>
                                     <tbody>
                                     {% for itemFijo in itemsFijos %}
                                         <tr data-req="true" class="item-fijo">
-                                            <td>{{ itemFijo.item }}
+                                            <td class="mdl-data-table__cell--non-numeric">{{ itemFijo.item }}
                                                 <script>
                                                     var options = {
                                                         url: function (phrase) {
@@ -124,13 +120,11 @@
                                                     });
                                                 </script>
                                             </td>
-                                            <td>{{ itemFijo.iva }}</td>
                                             <td>{{ itemFijo.valor }}</td>
                                         </tr>
                                     {% endfor %}
                                     <tr id="item-fijo-empty" data-req="false" style="display: none;">
-                                        <td>{{ itemsFijos.empty_form.item }}</td>
-                                        <td>{{ itemsFijos.empty_form.iva }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ itemsFijos.empty_form.item }}</td>
                                         <td>{{ itemsFijos.empty_form.valor }}</td>
                                     </tr>
                                     </tbody>
@@ -352,10 +346,12 @@
                 dialogPolyfill.registerDialog(dialog);
             }
             $('dialog tbody tr').hide();
+            $("dialog .energia-item").attr("readonly", true);
             $('dialog .energia-item[name*="energia-' + n_escala + '-"]').each(function () {
                 $(this).parents(".item-energia").show();
             });
             $("dialog #add-item-energia").attr("data-escala", n_escala);
+            $("dialog .fijos-item").attr("readonly", true);
             $('dialog .fijos-item[name*="fijos-' + n_escala + '-"]').each(function () {
                 $(this).parents(".item-fijo").show();
             });
@@ -380,8 +376,8 @@
                 // Relabel or rename all the relevant bits
                 $(row).children().children().each(function () {
                     updateElementCompIndex(this, prefix, formCount);
-                    $(this).val("");
-                    $(this).removeAttr('value');
+                    $(this).val("").removeAttr('value readonly');
+
                 });
 
                 //Autocompletar en item
@@ -431,8 +427,7 @@
                 // Relabel or rename all the relevant bits
                 $(row).children().children().each(function () {
                     updateElementCompIndex(this, prefix, formCount);
-                    $(this).val("");
-                    $(this).removeAttr('value');
+                    $(this).val("").removeAttr('value readonly');
                 });
 
                 //Autocompletar en item

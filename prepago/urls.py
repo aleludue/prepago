@@ -21,7 +21,8 @@ from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table, get
 from prepapp.views import SociosList, SociosAlta, SociosModificar, TerrenoList, TerrenoAlta, TerrenoModificar, \
     TarifaList, TarifaAlta, TarifaModificar, CespList, CespAlta, CespModificar, sociosSuspender, sociosHabilitar, \
     terrenosSuspender, terrenosHabilitar, ItemsList, ItemsAlta, ItemsModificar, itemsSuspender, itemsHabilitar, \
-    sociosSuspender, sociosHabilitar, terrenosSuspender, terrenosHabilitar, tarifaConfiguracion
+    sociosSuspender, sociosHabilitar, terrenosSuspender, terrenosHabilitar, tarifaConfiguracion, ImportacionAgua, \
+    tarifaEdicion
 
 sociosPatterns = [
     url(r'list/$', SociosList.as_view(), name="SociosList"),
@@ -45,7 +46,7 @@ terrenosPatterns = [
 tarifasPatterns = [
     url(r'list/$', TarifaList.as_view(), name="TarifasList"),
     url(r'new/$', tarifaConfiguracion, name="TarifasAlta"),
-    url(r'update/(?P<pk>\d+)$', TarifaModificar.as_view(), name="TarifasModificar")
+    url(r'update/(?P<pk>\d+)$', tarifaEdicion, name="TarifasModificar")
 ]
 
 cespPatterns = [
@@ -66,7 +67,10 @@ itemsPatterns = [
     url(r'get_items_energia_fk/$', get_items_energia_fk, name='get_items_energia_fk'),
     url(r'get_items_fijos_req/$', get_items_fijos_req, name='get_items_fijos_req'),
     url(r'get_items_energia_req/$', get_items_energia_req, name='get_items_energia_req'),
+]
 
+cargosFijosPatterns = [
+    url(r'importacion/$', ImportacionAgua.as_view(), name="ImportacionAgua"),
 ]
 
 urlpatterns = [
@@ -75,5 +79,6 @@ urlpatterns = [
     url(r'^terrenos/', include(terrenosPatterns)),
     url(r'^tarifas/', include(tarifasPatterns)),
     url(r'^cesp/', include(cespPatterns)),
-    url(r'^items/', include(itemsPatterns))
+    url(r'^items/', include(itemsPatterns)),
+    url(r'^cargos_fijos/', include(cargosFijosPatterns))
 ]
