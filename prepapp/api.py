@@ -8,9 +8,10 @@ from decimal import Decimal
 
 from django.core.urlresolvers import reverse
 from django.db.models.query_utils import Q
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseNotAllowed
+from django.views.decorators.csrf import csrf_exempt
 
-from prepapp.models import Socio, Terreno, Items, Cesp
+from prepapp.models import Socio, Terreno, Items, Cesp, Tarifa
 
 
 def get_socios_fk(request):
@@ -267,7 +268,7 @@ def get_terrenos_table(request):
 def get_items_table(request):
     # SETEOS INICIALES
     objects = Items.objects.all()
-    list_display = ['nombre', 'tipo', 'aplicacion']
+    list_display = ['nombre', 'tipo_display', 'aplicacion_display']
     list_global_search = ['nombre']
     data_struct = {0: 'nombre', 1: 'tipo', 2: 'aplicacion'}
 
@@ -304,6 +305,7 @@ def get_items_table(request):
     s.seek(0)
     return HttpResponse(s.read())
 
+
 def get_cesp_table(request):
     # SETEOS INICIALES
     objects = Cesp.objects.all()
@@ -330,6 +332,55 @@ def get_cesp_table(request):
 
     # extract information
     data = make_data(objects, list_display, "CespModificar")
+    # define response
+    response = {
+        'data': data,
+        'recordsTotal': recordsTotal,
+        'recordsFiltered': recordsFiltered,
+        'draw': request.GET['draw']
+    }
+
+    # serialize to json
+    s = StringIO()
+    json.dump(response, s)
+    s.seek(0)
+    return HttpResponse(s.read())
+
+def get_tarifas_table(request):
+    # SETEOS INICIALES
+    objects = Tarifa.objects.all()
+    list_display = ['nombre']
+    list_global_search = list_display
+    data_struct = {0: 'nombre'}
+
+    # Cuenta total de articulos:
+    recordsTotal = objects.count()
+
+    # Filtrado de los bancos
+    objects = filtering(request.GET, objects, data_struct, list_global_search)
+
+    # Ordenado
+    objects = ordering(request.GET, objects, data_struct)
+
+    # Conteo de articulos despues dle filtrado
+    recordsFiltered = objects.count()
+
+    # finally, slice according to length sent by dataTables:
+    start = int(request.GET['start'])
+    length = int(request.GET['length'])
+    objects = objects[start: (start + length)]
+
+    url_modif=None
+
+    data = []
+    for obj in objects:
+        row = map(lambda field: _getattr_foreingkey(obj, field), list_display)
+        if url_modif:
+            row.append(
+                '<a class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" href="%s"><i class="material-icons">mode_edit</i></a>' % reverse(
+                    url_modif, args=[obj.pk]))
+        data.append(row)
+
     # define response
     response = {
         'data': data,

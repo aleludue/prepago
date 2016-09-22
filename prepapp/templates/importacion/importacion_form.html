@@ -1,26 +1,30 @@
 {% extends "base.html" %}
 
 {% block siteTitle %}
-    Sistema de Energia Prepaga - Items
+    Sistema de Energia Prepaga - Importación de agua
 {% endblock %}
 
 {% block pageTitle %}
-    Gestión de Items
+    Importación de Agua
 {% endblock %}
 
 {% block pageContent %}
     <div class="mdl-grid">
         <div class="mdl-cell--2-col"></div>
         <div class="mdl-cell--8-col">
-            <form method="post" autocomplete="off" novalidate>{% csrf_token %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
                 {{ form.as_mdl }}
+{#                <div class="mdl-grid">#}
+{#                    <div class="mdl--cell">#}
+{#                        <input type="file" name="agua" multiple>#}
+{#                    </div>#}
+{#                </div>#}
                 <div class="mdl-grid">
                     <div class="mdl-cell--12-col">
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                 type="submit">Aceptar<i
                                 class="material-icons">send</i></button>
-                        <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" type="reset"
-                               value="Deshacer cambios"/>
                         <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" type="button"
                                value="Cancelar"
                                onclick="history.back()">

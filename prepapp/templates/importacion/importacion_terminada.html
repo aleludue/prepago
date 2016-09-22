@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block siteTitle %}
+    Sistema de Energia Prepaga - Importación de agua
+{% endblock %}
+
+{% block pageTitle %}
+    Importación de Agua
+{% endblock %}
+
+{% block pageContent %}
+    <div class="mdl-grid">
+        <div class="mdl-cell--2-col"></div>
+        <div class="mdl-cell--8-col">
+            <div class="mdl-grid">
+                <div class="mdl-cell--12-col">
+                    <h2>Importación de consumos completada</h2>
+                </div>
+            </div>
+            <div class="mdl-grid">
+                <div class="mdl-cell--12-col">
+                    <h5>Importadas {{ lecturas_exitosas }} lecturas</h5>
+                </div>
+            </div>
+            <div class="mdl-grid">
+                <div class="mdl-cell--12-col">
+                    <ul class="demo-list-two mdl-list">
+                        {% for terreno in terrenos_sin_lecturas %}
+                            <li class="mdl-list__item mdl-list__item--two-line">
+                                <span class="mdl-list__item-primary-content">
+                                    <i class="material-icons mdl-list__item-avatar">person</i>
+                                    <span>{{ terreno.socio.razonSocial }}</span>
+                                    <span class="mdl-list__item-sub-title">
+                                        {{ terreno.nroMedidorAgua }}
+                                    </span>
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
