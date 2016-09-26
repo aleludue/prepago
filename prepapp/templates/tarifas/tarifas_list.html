@@ -29,7 +29,7 @@
             <td>Nombre</td>
             <td>Detalle</td>
             <td style="width: 20px;"></td>
-            <td style="width: 20px;"></td>
+{#            <td style="width: 20px;"></td>#}
         </tr>
         </thead>
         <tbody></tbody>
@@ -39,15 +39,15 @@
             var tabla_tarifas = $('#tarifas').DataTable({
                 "columnDefs": [
                     {
-                        "targets": [2,3],
+                        "targets": [2],
                         "orderable": false,
                         "className": "datatables-mdl--action-col"
                     },
                     {
-                        "targets": [0,1,2,3],
+                        "targets": [0,1,2],
                         "className": "mdl-data-table__cell--non-numeric"
                     }],
-                "ajax": "{% url "get_terrenos_table" %}",
+                "ajax": "{% url "get_tarifas_table" %}",
                 "order": [[0, "asc"]],
                 "orderMulti": false,
                 "language": {

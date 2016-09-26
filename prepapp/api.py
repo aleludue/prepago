@@ -28,6 +28,7 @@ def get_socios_fk(request):
     s.seek(0)
     return HttpResponse(s.read())
 
+
 def get_items_fijos_fk(request):
     phrase = request.GET['ph']
     items_qs = Items.objects.filter(nombre__icontains=phrase, aplicacion='CF', requerido=False)
@@ -38,6 +39,7 @@ def get_items_fijos_fk(request):
     json.dump(items, s)
     s.seek(0)
     return HttpResponse(s.read())
+
 
 def get_items_energia_fk(request):
     phrase = request.GET['ph']
@@ -50,6 +52,7 @@ def get_items_energia_fk(request):
     s.seek(0)
     return HttpResponse(s.read())
 
+
 def get_items_fijos_req(request):
     items_qs = Items.objects.filter(aplicacion='CF', requerido=True)
     items = []
@@ -59,6 +62,7 @@ def get_items_fijos_req(request):
     json.dump(items, s)
     s.seek(0)
     return HttpResponse(s.read())
+
 
 def get_items_energia_req(request):
     items_qs = Items.objects.filter(aplicacion='EN', requerido=True)
@@ -346,6 +350,7 @@ def get_cesp_table(request):
     s.seek(0)
     return HttpResponse(s.read())
 
+
 def get_tarifas_table(request):
     # SETEOS INICIALES
     objects = Tarifa.objects.all()
@@ -370,11 +375,29 @@ def get_tarifas_table(request):
     length = int(request.GET['length'])
     objects = objects[start: (start + length)]
 
-    url_modif=None
+    url_modif = None
 
     data = []
     for obj in objects:
         row = map(lambda field: _getattr_foreingkey(obj, field), list_display)
+        html = "<ul>"
+        for agrup in obj.agrupaciondeitems_set.all():
+            html += "<li>Escala " + str(agrup.desde) + " a " + str(agrup.hasta) + "<ul><li>Cargos Fijos<ul>"
+            for asoc in agrup.asociacionitemagrupacion_set.filter(item__aplicacion='CF'):
+                html += "<li>" + asoc.item.nombre + " - " + asoc.item.get_tipo_display() + " - $" + str(asoc.valor) + "</li>"
+            html += "</ul></li><li>Energia<ul>"
+            for asoc in agrup.asociacionitemagrupacion_set.filter(item__aplicacion='EN'):
+                if asoc.item.tipo == "ESC":
+                    html += "<li>" + asoc.item.nombre + " - " + asoc.item.get_tipo_display() + "<ul>"
+                    for esc in asoc.escalones_set.all():
+                        html += "<li>" + str(esc.desde) + " a " + str(esc.hasta) + " - $" + str(esc.valor) + "</li>"
+                    html += "</ul> "
+                else:
+                    html += "<li>" + asoc.item.nombre + " - " + asoc.item.get_tipo_display() + " - $" + str(asoc.valor) + "</li></ul>"
+            html += "</ul></li>"
+        html += "</ul>"
+
+        row.append(html)
         if url_modif:
             row.append(
                 '<a class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" href="%s"><i class="material-icons">mode_edit</i></a>' % reverse(

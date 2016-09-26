@@ -239,6 +239,12 @@ class EscalasForm(forms.Form):
     desde = forms.IntegerField()
     hasta = forms.IntegerField()
 
+    def clean_hasta(self):
+        has = self.cleaned_data['hasta']
+        des = self.cleaned_data['desde']
+        if has < des:
+            raise forms.ValidationError("El valor del campo 'hasta' no puede ser inferior al valor del campo 'desde'")
+        return has
 
 class ItemsEnergiaForm(forms.Form):
     item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='EN'),
