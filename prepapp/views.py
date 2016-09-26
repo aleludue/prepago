@@ -89,61 +89,68 @@ class TarifaList(TemplateView):
 def tarifaConfiguracion(request):
     if request.method == 'POST':  # If the form has been submitted...
         tarifaForm = TarifaForm(request.POST)
-        if tarifaForm.is_valid():
+        EscalaFormset = formset_factory(EscalasForm, extra=0)
+        escalaFormset = EscalaFormset(request.POST, prefix='escala')
+        formsets_fijos = formsets_energia = []
+        all_formsets_valid = True
+        for i, escala in enumerate(escalaFormset.forms):
+            ItemFijoFormset = formset_factory(ItemsFijoForm, extra=0)
+            itemFijoFormset = ItemFijoFormset(request.POST, prefix='fijos-' + str(i))
+            all_formsets_valid = all_formsets_valid and itemFijoFormset.is_valid()
+            formsets_fijos.append(itemFijoFormset)
+            ItemEnergiaFormset = formset_factory(ItemsEnergiaForm, extra=0)
+            itemEnergiaFormset = ItemEnergiaFormset(request.POST, prefix='energia-' + str(i))
+            all_formsets_valid = all_formsets_valid and itemEnergiaFormset.is_valid()
+            formsets_energia.append(itemEnergiaFormset)
+        if tarifaForm.is_valid() and escalaFormset.is_valid() and all_formsets_valid:
             tarifa = tarifaForm.save()
             EscalaFormset = formset_factory(EscalasForm, extra=0)
             escalaFormset = EscalaFormset(request.POST, prefix='escala')
-            if escalaFormset.is_valid():
-                i = 0
-                for form in escalaFormset.forms:
-                    escala = AgrupacionDeItems(tarifa=tarifa,
-                                               desde=form.cleaned_data['desde'],
-                                               hasta=form.cleaned_data['hasta'])
-                    escala.save()
-                    ItemFijoFormset = formset_factory(ItemsFijoForm, extra=0)
-                    itemFijoFormset = ItemFijoFormset(request.POST, prefix='fijos-' + str(i))
-                    if itemFijoFormset.is_valid():
-                        for form in itemFijoFormset.forms:
-                            if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
-                                escalones = form.cleaned_data['valor'].split(";")
-                                asoc = AsociacionItemAgrupacion(agrupacion=escala,
-                                                                item=form.cleaned_data['item'],
-                                                                valor=None)
-                                asoc.save()
-                                for escalon in escalones:
-                                    regex = re.search("(\d+):(\d+)=(.+)", escalon)
-                                    Escalones(asociacion=asoc,
-                                              item=form.cleaned_data['item'],
-                                              desde=regex.group(1),
-                                              hasta=regex.group(2),
-                                              valor=regex.group(3)).save()
-                            else:
-                                AsociacionItemAgrupacion(agrupacion=escala,
-                                                         item=form.cleaned_data['item'],
-                                                         valor=form.cleaned_data['valor']).save()
-                    ItemEnergiaFormset = formset_factory(ItemsEnergiaForm, extra=0)
-                    itemEnergiaFormset = ItemEnergiaFormset(request.POST, prefix='energia-' + str(i))
-                    if itemEnergiaFormset.is_valid():
-                        for form in itemEnergiaFormset.forms:
-                            if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
-                                escalones = form.cleaned_data['valor'].split(";")
-                                asoc = AsociacionItemAgrupacion(agrupacion=escala,
-                                                                item=form.cleaned_data['item'],
-                                                                valor=None)
-                                asoc.save()
-                                for escalon in escalones:
-                                    regex = re.search("(\d+):(\d+)=(.+)", escalon)
-                                    Escalones(asociacion=asoc,
-                                              item=form.cleaned_data['item'],
-                                              desde=regex.group(1),
-                                              hasta=regex.group(2),
-                                              valor=regex.group(3)).save()
-                            else:
-                                AsociacionItemAgrupacion(agrupacion=escala,
-                                                         item=form.cleaned_data['item'],
-                                                         valor=form.cleaned_data['valor']).save()
-
-                    i += 1
+            for i, form in enumerate(escalaFormset.forms):
+                escala = AgrupacionDeItems(tarifa=tarifa,
+                                           desde=form.cleaned_data['desde'],
+                                           hasta=form.cleaned_data['hasta'])
+                escala.save()
+                ItemFijoFormset = formset_factory(ItemsFijoForm, extra=0)
+                itemFijoFormset = ItemFijoFormset(request.POST, prefix='fijos-' + str(i))
+                for form in itemFijoFormset.forms:
+                    if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
+                        escalones = form.cleaned_data['valor'].split(";")
+                        asoc = AsociacionItemAgrupacion(agrupacion=escala,
+                                                        item=form.cleaned_data['item'],
+                                                        valor=None)
+                        asoc.save()
+                        for escalon in escalones:
+                            regex = re.search("(\d+):(\d+)=(.+)", escalon)
+                            Escalones(asociacion=asoc,
+                                      item=form.cleaned_data['item'],
+                                      desde=regex.group(1),
+                                      hasta=regex.group(2),
+                                      valor=regex.group(3)).save()
+                    else:
+                        AsociacionItemAgrupacion(agrupacion=escala,
+                                                 item=form.cleaned_data['item'],
+                                                 valor=form.cleaned_data['valor']).save()
+                ItemEnergiaFormset = formset_factory(ItemsEnergiaForm, extra=0)
+                itemEnergiaFormset = ItemEnergiaFormset(request.POST, prefix='energia-' + str(i))
+                for form in itemEnergiaFormset.forms:
+                    if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
+                        escalones = form.cleaned_data['valor'].split(";")
+                        asoc = AsociacionItemAgrupacion(agrupacion=escala,
+                                                        item=form.cleaned_data['item'],
+                                                        valor=None)
+                        asoc.save()
+                        for escalon in escalones:
+                            regex = re.search("(\d+):(\d+)=(.+)", escalon)
+                            Escalones(asociacion=asoc,
+                                      item=form.cleaned_data['item'],
+                                      desde=regex.group(1),
+                                      hasta=regex.group(2),
+                                      valor=regex.group(3)).save()
+                    else:
+                        AsociacionItemAgrupacion(agrupacion=escala,
+                                                 item=form.cleaned_data['item'],
+                                                 valor=form.cleaned_data['valor']).save()
 
             return HttpResponseRedirect(reverse_lazy('TarifasList'))
 
@@ -152,18 +159,22 @@ def tarifaConfiguracion(request):
         EscalasFormset = formset_factory(EscalasForm, extra=1)
         escalasFormset = EscalasFormset(prefix='escala')
         ItemsFijos = formset_factory(ItemsFijoForm, extra=0)
+        formsets_fijos = []
         req_fijos = Items.objects.filter(requerido=True, aplicacion='CF')
         initial_req_fijos = [{'item': req} for req in req_fijos]
         itemsFijos = ItemsFijos(prefix='fijos-0', initial=initial_req_fijos)
+        formsets_fijos.append(itemsFijos)
         ItemsEnergia = formset_factory(ItemsEnergiaForm, extra=0)
+        formsets_energia = []
         req_energia = Items.objects.filter(requerido=True, aplicacion='EN')
         initial_req_energia = [{'item': req} for req in req_energia]
         itemsEnergia = ItemsEnergia(prefix='energia-0', initial=initial_req_energia)
+        formsets_energia.append(itemsEnergia)
 
     c = {'tarifaForm': tarifaForm,
          'escalasFormset': escalasFormset,
-         'itemsEnergia': itemsEnergia,
-         'itemsFijos': itemsFijos,
+         'formsets_energia': formsets_energia,
+         'formsets_fijos': formsets_fijos,
          }
     c.update(csrf(request))
 
@@ -172,92 +183,131 @@ def tarifaConfiguracion(request):
 
 def tarifaEdicion(request, pk):
     if request.method == 'POST':  # If the form has been submitted...
-        tarifaForm = TarifaForm(request.POST)
-        if tarifaForm.is_valid():
+        tarifaForm = TarifaForm(request.POST, instance=Tarifa.objects.get(pk=pk))
+        EscalaFormset = formset_factory(EscalasForm, extra=0)
+        escalaFormset = EscalaFormset(request.POST, prefix='escala')
+        formsets_fijos = formsets_energia = []
+        all_formsets_valid = True
+        for i, escala in enumerate(escalaFormset.forms):
+            ItemFijoFormset = formset_factory(ItemsFijoForm, extra=0)
+            itemFijoFormset = ItemFijoFormset(request.POST, prefix='fijos-' + str(i))
+            all_formsets_valid = all_formsets_valid and itemFijoFormset.is_valid()
+            formsets_fijos.append(itemFijoFormset)
+            ItemEnergiaFormset = formset_factory(ItemsEnergiaForm, extra=0)
+            itemEnergiaFormset = ItemEnergiaFormset(request.POST, prefix='energia-' + str(i))
+            all_formsets_valid = all_formsets_valid and itemEnergiaFormset.is_valid()
+            formsets_energia.append(itemEnergiaFormset)
+        if tarifaForm.is_valid() and escalaFormset.is_valid() and all_formsets_valid:
             tarifa = tarifaForm.save()
-            EscalaFormset = formset_factory(EscalasForm, extra=0)
-            escalaFormset = EscalaFormset(request.POST, prefix='escala')
-            if escalaFormset.is_valid():
-                i = 0
-                for form in escalaFormset.forms:
+            for form in escalaFormset.forms:
+                if form.cleaned_data['escala']:
+                    agrup = form.cleaned_data['escala']
+                    agrup.desde = form.cleaned_data['desde']
+                    agrup.hasta = form.cleaned_data['hasta']
+                    agrup.save()
+                else:
                     escala = AgrupacionDeItems(tarifa=tarifa,
                                                desde=form.cleaned_data['desde'],
                                                hasta=form.cleaned_data['hasta'])
                     escala.save()
-                    ItemFijoFormset = formset_factory(ItemsFijoForm, extra=0)
-                    itemFijoFormset = ItemFijoFormset(request.POST, prefix='fijos-' + str(i))
-                    if itemFijoFormset.is_valid():
-                        for form in itemFijoFormset.forms:
-                            if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
-                                escalones = form.cleaned_data['valor'].split(";")
-                                asoc = AsociacionItemAgrupacion(agrupacion=escala,
-                                                                item=form.cleaned_data['item'],
-                                                                valor=None)
-                                asoc.save()
-                                for escalon in escalones:
-                                    regex = re.search("(\d+):(\d+)=(.+)", escalon)
-                                    Escalones(asociacion=asoc,
-                                              item=form.cleaned_data['item'],
-                                              desde=regex.group(1),
-                                              hasta=regex.group(2),
-                                              valor=regex.group(3)).save()
-                            else:
-                                AsociacionItemAgrupacion(agrupacion=escala,
-                                                         item=form.cleaned_data['item'],
-                                                         valor=form.cleaned_data['valor']).save()
-                    ItemEnergiaFormset = formset_factory(ItemsEnergiaForm, extra=0)
-                    itemEnergiaFormset = ItemEnergiaFormset(request.POST, prefix='energia-' + str(i))
-                    if itemEnergiaFormset.is_valid():
-                        for form in itemEnergiaFormset.forms:
-                            if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
-                                escalones = form.cleaned_data['valor'].split(";")
-                                asoc = AsociacionItemAgrupacion(agrupacion=escala,
-                                                                item=form.cleaned_data['item'],
-                                                                valor=None)
-                                asoc.save()
-                                for escalon in escalones:
-                                    regex = re.search("(\d+):(\d+)=(.+)", escalon)
-                                    Escalones(asociacion=asoc,
-                                              item=form.cleaned_data['item'],
-                                              desde=regex.group(1),
-                                              hasta=regex.group(2),
-                                              valor=regex.group(3)).save()
-                            else:
-                                AsociacionItemAgrupacion(agrupacion=escala,
-                                                         item=form.cleaned_data['item'],
-                                                         valor=form.cleaned_data['valor']).save()
-
-                    i += 1
-
+                for form in itemFijoFormset.forms:
+                    if form.cleaned_data['asoc']:
+                        asoc = form.cleaned_data['asoc']
+                        asoc.item = form.cleaned_data['item']
+                        if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
+                            asoc.escalones_set.all().delete()  # Borro todos los escalones
+                            escalones = form.cleaned_data['valor'].split(";")
+                            for escalon in escalones:
+                                regex = re.search("(\d+):(\d+)=(.+)", escalon)
+                                Escalones(asociacion=asoc,
+                                          desde=regex.group(1),
+                                          hasta=regex.group(2),
+                                          valor=regex.group(3)).save()
+                        else:
+                            asoc.valor = form.cleaned_data['valor']
+                        asoc.save()
+                    else:  # Asociacion nueva
+                        if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
+                            escalones = form.cleaned_data['valor'].split(";")
+                            asoc = AsociacionItemAgrupacion(agrupacion=escala,
+                                                            item=form.cleaned_data['item'],
+                                                            valor=None)
+                            asoc.save()
+                            for escalon in escalones:
+                                regex = re.search("(\d+):(\d+)=(.+)", escalon)
+                                Escalones(asociacion=asoc,
+                                          desde=regex.group(1),
+                                          hasta=regex.group(2),
+                                          valor=regex.group(3)).save()
+                        else:
+                            AsociacionItemAgrupacion(agrupacion=escala,
+                                                     item=form.cleaned_data['item'],
+                                                     valor=form.cleaned_data['valor']).save()
+                for form in itemEnergiaFormset.forms:
+                    if form.cleaned_data['asoc']:
+                        asoc = form.cleaned_data['asoc']
+                        asoc.item = form.cleaned_data['item']
+                        if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
+                            asoc.escalones_set.all().delete()  # Borro todos los escalones
+                            escalones = form.cleaned_data['valor'].split(";")
+                            for escalon in escalones:
+                                regex = re.search("(\d+):(\d+)=(.+)", escalon)
+                                Escalones(asociacion=asoc,
+                                          desde=regex.group(1),
+                                          hasta=regex.group(2),
+                                          valor=regex.group(3)).save()
+                        else:
+                            asoc.valor = form.cleaned_data['valor']
+                        asoc.save()
+                    else:  # Asociacion nueva
+                        if form.cleaned_data['item'].tipo == "ESC":  # Item escalonado--0:40=1.33;41:80=1.34
+                            escalones = form.cleaned_data['valor'].split(";")
+                            asoc = AsociacionItemAgrupacion(agrupacion=escala,
+                                                            item=form.cleaned_data['item'],
+                                                            valor=None)
+                            asoc.save()
+                            for escalon in escalones:
+                                regex = re.search("(\d+):(\d+)=(.+)", escalon)
+                                Escalones(asociacion=asoc,
+                                          desde=regex.group(1),
+                                          hasta=regex.group(2),
+                                          valor=regex.group(3)).save()
+                        else:
+                            AsociacionItemAgrupacion(agrupacion=escala,
+                                                     item=form.cleaned_data['item'],
+                                                     valor=form.cleaned_data['valor']).save()
             return HttpResponseRedirect(reverse_lazy('TarifasList'))
 
     else:
         tarifa = Tarifa.objects.get(pk=pk)
         tarifaForm = TarifaForm(instance=tarifa)
         EscalasFormset = formset_factory(EscalasForm, extra=0)
-        initial_escala = [{'desde': escala.desde, 'hasta': escala.hasta} for escala in
+        initial_escala = [{'escala': escala, 'desde': escala.desde, 'hasta': escala.hasta} for escala in
                           tarifa.agrupaciondeitems_set.all()]
         escalasFormset = EscalasFormset(prefix='escala', initial=initial_escala)
         ItemsFijos = formset_factory(ItemsFijoForm, extra=0)
+        formsets_fijos = []
         for idx, escala in enumerate(tarifa.agrupaciondeitems_set.all()):
-            initial_fijos = [{'item': cf.item, 'valor': cf.valor} for cf in
-                             escala.asociacionitemagrupacion_set.filter(item__tipo='CF')]
-
-        initial_req_fijos = [{'item': req} for req in req_fijos]
-        itemsFijos = ItemsFijos(prefix='fijos-0', initial=initial_req_fijos)
+            initial_fijos = [{'item': cf.item, 'valor': cf.valor_escalonado()} for cf in
+                             escala.asociacionitemagrupacion_set.filter(item__aplicacion='CF')]
+            itemsFijos = ItemsFijos(prefix='fijos-' + str(idx), initial=initial_fijos)
+            formsets_fijos.append(itemsFijos)
         ItemsEnergia = formset_factory(ItemsEnergiaForm, extra=0)
-        req_energia = Items.objects.filter(requerido=True, aplicacion='EN')
-        initial_req_energia = [{'item': req} for req in req_energia]
-        itemsEnergia = ItemsEnergia(prefix='energia-0', initial=initial_req_energia)
+        formsets_energia = []
+        for idx, escala in enumerate(tarifa.agrupaciondeitems_set.all()):
+            initial_energia = [{'item': cf.item, 'valor': cf.valor_escalonado()} for cf in
+                               escala.asociacionitemagrupacion_set.filter(item__aplicacion='EN')]
+            itemsEnergia = ItemsEnergia(prefix='energia-' + str(idx), initial=initial_energia)
+            formsets_energia.append(itemsEnergia)
 
     c = {'tarifaForm': tarifaForm,
          'escalasFormset': escalasFormset,
-         'itemsEnergia': itemsEnergia,
-         'itemsFijos': itemsFijos,
+         'formsets_energia': formsets_energia,
+         'formsets_fijos': formsets_fijos,
          }
     c.update(csrf(request))
 
-    return render_to_response('tarifas/tarifas_form.html', c)
+    return render_to_response('tarifas/tarifas_form_update.html', c)
 
 
 class ItemsAlta(CreateView):

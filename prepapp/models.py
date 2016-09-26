@@ -84,6 +84,7 @@ class Items(models.Model):
     fk_fields = ('nombre',)
     TIPOS_CHOICES = (('FIJ', 'Fijo'),
                      ('VAR', 'Variable'),
+                     ('POR', 'Porcentaje'),
                      ('ESC', 'Escalonado'))
 
     APLICACION_CHOICES = (('CF', 'Cargo Fijo'),
@@ -149,6 +150,15 @@ class AsociacionItemAgrupacion(models.Model):
     item = models.ForeignKey(Items, on_delete=models.CASCADE)
     # iva = models.CharField(max_length=5, choices=IVA_CHOICES)
     valor = models.DecimalField(max_digits=10, decimal_places=5, blank=True, null=True)
+
+    def valor_escalonado(self):
+        if self.item.tipo == 'ESC':
+            cadena_escalones = ""
+            for escalon in self.escalones_set.all():
+                cadena_escalones += str(escalon.desde)+":"+str(escalon.hasta)+"="+str(escalon.valor)+";"
+            return cadena_escalones[:-1]
+        else:
+            return self.valor
 
 
 class Escalones(models.Model):

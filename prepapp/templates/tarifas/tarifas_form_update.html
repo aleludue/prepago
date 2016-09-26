@@ -36,53 +36,51 @@
                                         <p>Items Energía</p>
                                     </div>
                                 </div>
-                                <div style="max-height: 250px;overflow: auto">
-                                    <table id="tabla-energia" class="mdl-data-table mdl-js-data-table" width="100%">
-                                        <thead>
-                                        <td class="mdl-data-table__cell--non-numeric">Item</td>
-                                        <td>Valor</td>
-                                        </thead>
-                                        <tbody>
-                                        {% for energia in formsets_energia %}
-                                            {% for energia_f in energia.forms %}
-                                                <tr data-req="true"
-                                                    class="item-energia mdl-data-table__cell--non-numeric">
-                                                    <td class="mdl-data-table__cell--non-numeric">{{ energia_f.item }}
-                                                        <script>
-                                                            var options = {
-                                                                url: function (phrase) {
-                                                                    return "{% url "get_items_energia_fk" %}" + "?ph=" + phrase;
-                                                                },
+                                <table id="tabla-energia" class="mdl-data-table mdl-js-data-table" width="100%">
+                                    <thead>
+                                    <td class="mdl-data-table__cell--non-numeric">Item</td>
+                                    <td>Valor</td>
+                                    </thead>
+                                    <tbody>
+                                    {% for energia in formsets_energia %}
+                                        {% for energia_f in energia.forms %}
+                                            <tr data-req="true" class="item-energia mdl-data-table__cell--non-numeric">
+                                                {{ energia_f.asoc }}
+                                                <td class="mdl-data-table__cell--non-numeric">{{ energia_f.item }}
+                                                    <script>
+                                                        var options = {
+                                                            url: function (phrase) {
+                                                                return "{% url "get_items_energia_fk" %}" + "?ph=" + phrase;
+                                                            },
 
-                                                                getValue: "fk_display",
+                                                            getValue: "fk_display",
 
-                                                                list: {
-                                                                    onChooseEvent: function () {
-                                                                        var value = $("#id_energia-0-0-item_0").getSelectedItemData().pk;
-                                                                        $("#id_energia-0-0-item_1").val(value).trigger("change");
-                                                                    }
+                                                            list: {
+                                                                onChooseEvent: function () {
+                                                                    var value = $("#id_energia-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}-item_0").getSelectedItemData().pk;
+                                                                    $("#id_energia-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}-item_1").val(value).trigger("change");
                                                                 }
-                                                            };
+                                                            }
+                                                        };
 
-                                                            $("#id_energia-0-0-item_0").easyAutocomplete(options);
-                                                            $("#id_energia-0-0-item_0").on("change", function () {
-                                                                if ($(this).val() == '') {
-                                                                    $("#id_energia-0-0-item_1").val("").trigger("change");
-                                                                }
-                                                            });
-                                                        </script>
-                                                    </td>
-                                                    <td>{{ energia_f.valor }}</td>
-                                                </tr>
-                                            {% endfor %}
+                                                        $("#id_energia-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}-item_0").easyAutocomplete(options);
+                                                        $("#id_energia-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}-item_0").on("change", function () {
+                                                            if ($(this).val() == '') {
+                                                                $("#id_energia-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}-item_1").val("").trigger("change");
+                                                            }
+                                                        });
+                                                    </script>
+                                                </td>
+                                                <td>{{ energia_f.valor }}</td>
+                                            </tr>
                                         {% endfor %}
-                                        <tr id="item-energia-empty" data-req="false" style="display: none;">
-                                            <td class="mdl-data-table__cell--non-numeric">{{ formsets_energia.0.empty_form.item }}</td>
-                                            <td>{{ formsets_energia.0.empty_form.valor }}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                    {% endfor %}
+                                    <tr id="item-energia-empty" data-req="false" style="display: none;">
+                                        <td class="mdl-data-table__cell--non-numeric">{{ formsets_energia.0.empty_form.item }}</td>
+                                        <td>{{ formsets_energia.0.empty_form.valor }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                                 <div class="mdl-grid">
                                     <div class="mdl-cell--1-col">
                                         <button type="button" id="add-item-energia" data-escala="-1"
@@ -96,52 +94,51 @@
                                         <p>Items Fijos</p>
                                     </div>
                                 </div>
-                                <div style="max-height: 250px;overflow: auto">
-                                    <table id="tabla-fijo" class="mdl-data-table mdl-js-data-table" width="100%">
-                                        <thead>
-                                        <td class="mdl-data-table__cell--non-numeric">Item</td>
-                                        <td>Valor</td>
-                                        </thead>
-                                        <tbody>
-                                        {% for fijo in formsets_fijos %}
-                                            {% for fijo_f in fijo.forms %}
-                                                <tr data-req="true" class="item-fijo">
-                                                    <td class="mdl-data-table__cell--non-numeric">{{ fijo_f.item }}
-                                                        <script>
-                                                            var options = {
-                                                                url: function (phrase) {
-                                                                    return "{% url "get_items_fijos_fk" %}" + "?ph=" + phrase;
-                                                                },
+                                <table id="tabla-fijo" class="mdl-data-table mdl-js-data-table" width="100%">
+                                    <thead>
+                                    <td class="mdl-data-table__cell--non-numeric">Item</td>
+                                    <td>Valor</td>
+                                    </thead>
+                                    <tbody>
+                                    {% for fijo in formsets_fijos %}
+                                        {% for fijo_f in fijo.forms %}
+                                            <tr data-req="true" class="item-fijo">
+                                            {{ fijo_f.asoc }}
+                                                <td class="mdl-data-table__cell--non-numeric">{{ fijo_f.item }}
+                                                    <script>
+                                                        var options = {
+                                                            url: function (phrase) {
+                                                                return "{% url "get_items_fijos_fk" %}" + "?ph=" + phrase;
+                                                            },
 
-                                                                getValue: "fk_display",
+                                                            getValue: "fk_display",
 
-                                                                list: {
-                                                                    onChooseEvent: function () {
-                                                                        var value = $("#id_fijos-0-0-item_0").getSelectedItemData().pk;
-                                                                        $("#id_fijos-0-0-item_1").val(value).trigger("change");
-                                                                    }
+                                                            list: {
+                                                                onChooseEvent: function () {
+                                                                    var value = $("#id_fijos-0-0-item_0").getSelectedItemData().pk;
+                                                                    $("#id_fijos-0-0-item_1").val(value).trigger("change");
                                                                 }
-                                                            };
+                                                            }
+                                                        };
 
-                                                            $("#id_fijos-0-0-item_0").easyAutocomplete(options);
-                                                            $("#id_fijos-0-0-item_0").on("change", function () {
-                                                                if ($(this).val() == '') {
-                                                                    $("#id_fijos-0-0-item_1").val("").trigger("change");
-                                                                }
-                                                            });
-                                                        </script>
-                                                    </td>
-                                                    <td>{{ fijo_f.valor }}</td>
-                                                </tr>
-                                            {% endfor %}
+                                                        $("#id_fijos-0-0-item_0").easyAutocomplete(options);
+                                                        $("#id_fijos-0-0-item_0").on("change", function () {
+                                                            if ($(this).val() == '') {
+                                                                $("#id_fijos-0-0-item_1").val("").trigger("change");
+                                                            }
+                                                        });
+                                                    </script>
+                                                </td>
+                                                <td>{{ fijo_f.valor }}</td>
+                                            </tr>
                                         {% endfor %}
-                                        <tr id="item-fijo-empty" data-req="false" style="display: none;">
-                                            <td class="mdl-data-table__cell--non-numeric">{{ formsets_fijos.0.empty_form.item }}</td>
-                                            <td>{{ formsets_fijos.0.empty_form.valor }}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                    {% endfor %}
+                                    <tr id="item-fijo-empty" data-req="false" style="display: none;">
+                                        <td class="mdl-data-table__cell--non-numeric">{{ formsets_fijos.0.empty_form.item }}</td>
+                                        <td>{{ formsets_fijos.0.empty_form.valor }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                                 <div class="mdl-grid">
                                     <div class="mdl-cell--1-col">
                                         <button type="button" id="add-item-fijo" data-escala="-1"
@@ -160,6 +157,7 @@
                         </button>
                     </div>
                 </dialog>
+
                 <div class="mdl-grid">
                     <div class="mdl-cell--6-col mdl-cell--2-offset">
                         <div class="mdl-textfield mdl-js-textfield">
@@ -184,12 +182,12 @@
                             <tbody>
                             {% for escala in escalasFormset.forms %}
                                 <tr class="escala">
+                                {{ escala.escala }}
                                     <td class="columna_desde">
                                         {{ escala.desde }}
                                     </td>
                                     <td class="columna_hasta">
                                         {{ escala.hasta }}
-                                        {{ escala.hasta.errors }}
                                     </td>
                                     <td class="columna_detalle">
 

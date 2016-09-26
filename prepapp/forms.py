@@ -10,7 +10,7 @@ from django.forms.fields import CharField
 from django.utils import encoding, html, safestring
 
 from prepapp import multiupload
-from prepapp.models import Socio, Terreno, Tarifa, Escalones, Items, Cesp, AsociacionItemAgrupacion
+from prepapp.models import Socio, Terreno, Tarifa, Escalones, Items, Cesp, AsociacionItemAgrupacion, AgrupacionDeItems
 
 
 def charfield_handler(field):
@@ -236,6 +236,8 @@ class TarifaForm(MDLBaseModelForm):
 
 
 class EscalasForm(forms.Form):
+    escala = forms.ModelChoiceField(queryset=AgrupacionDeItems.objects.all(), widget=forms.HiddenInput(),
+                                    required=False)
     desde = forms.IntegerField()
     hasta = forms.IntegerField()
 
@@ -247,6 +249,8 @@ class EscalasForm(forms.Form):
         return has
 
 class ItemsEnergiaForm(forms.Form):
+    asoc = forms.ModelChoiceField(queryset=AsociacionItemAgrupacion.objects.filter(item__aplicacion='EN'),
+                                  widget=forms.HiddenInput(), required=False)
     item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='EN'),
                                   widget=AutoCompleteFKMultiWidget(attrs={'class': 'energia-item'}))
     # iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES,
@@ -256,6 +260,8 @@ class ItemsEnergiaForm(forms.Form):
 
 
 class ItemsFijoForm(forms.Form):
+    asoc = forms.ModelChoiceField(queryset=AsociacionItemAgrupacion.objects.filter(item__aplicacion='CF'),
+                                  widget=forms.HiddenInput(), required=False)
     item = forms.ModelChoiceField(queryset=Items.objects.filter(aplicacion='CF'),
                                   widget=AutoCompleteFKMultiWidget(attrs={'class': 'fijos-item'}))
     # iva = forms.ChoiceField(choices=AsociacionItemAgrupacion.IVA_CHOICES,
