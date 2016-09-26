@@ -19,7 +19,7 @@ from django.contrib import admin
 from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table, get_items_table, get_cesp_table, \
     get_items_fijos_fk, get_items_energia_fk, get_items_fijos_req, get_items_energia_req
 from prepapp.views import SociosList, SociosAlta, SociosModificar, TerrenoList, TerrenoAlta, TerrenoModificar, \
-    TarifaList, TarifaAlta, TarifaModificar, CespList, CespAlta, CespModificar, sociosSuspender, sociosHabilitar, \
+    TarifaList, CespList, CespAlta, CespModificar, sociosSuspender, sociosHabilitar, \
     terrenosSuspender, terrenosHabilitar, ItemsList, ItemsAlta, ItemsModificar, itemsSuspender, itemsHabilitar, \
     sociosSuspender, sociosHabilitar, terrenosSuspender, terrenosHabilitar, tarifaConfiguracion, ImportacionAgua, \
     tarifaEdicion
