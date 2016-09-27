@@ -205,6 +205,7 @@
                                         </span>
                                     </td>
                                 </tr>
+                                {{ escala.non_field_errors }}
                             {% endfor %}
                             <tr id="escala-empty" style="display: none;">
                                 <td class="columna_desde">
@@ -238,6 +239,7 @@
                         </button>
                     </div>
                 </div>
+                {{ escalasFormset.non_form_errors }}
                 <div class="mdl-grid">
                     <div class="mdl-cell--12-col">
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"

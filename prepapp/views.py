@@ -13,7 +13,7 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView
 
 from prepapp.forms import SociosForm, TerrenosForm, TarifaForm, CespForm, EscalasForm, ItemsFijoForm, ItemsEnergiaForm, \
-    ItemsForm, ImportacionAguaForm
+    ItemsForm, ImportacionAguaForm, escala_formset
 from prepapp.models import Socio, Terreno, Tarifa, Escalones, Cesp, Items, AgrupacionDeItems, AsociacionItemAgrupacion, \
     LecturasAgua
 
@@ -89,11 +89,11 @@ class TarifaList(TemplateView):
 def tarifaConfiguracion(request):
     if request.method == 'POST':  # If the form has been submitted...
         tarifaForm = TarifaForm(request.POST)
-        EscalaFormset = formset_factory(EscalasForm, extra=0)
-        escalaFormset = EscalaFormset(request.POST, prefix='escala')
+        EscalaFormset = formset_factory(EscalasForm, escala_formset, extra=0)
+        escalasFormset = EscalaFormset(request.POST, prefix='escala')
         formsets_fijos = formsets_energia = []
         all_formsets_valid = True
-        for i, escala in enumerate(escalaFormset.forms):
+        for i, escala in enumerate(escalasFormset.forms):
             ItemFijoFormset = formset_factory(ItemsFijoForm, extra=0)
             itemFijoFormset = ItemFijoFormset(request.POST, prefix='fijos-' + str(i))
             all_formsets_valid = all_formsets_valid and itemFijoFormset.is_valid()
@@ -102,9 +102,9 @@ def tarifaConfiguracion(request):
             itemEnergiaFormset = ItemEnergiaFormset(request.POST, prefix='energia-' + str(i))
             all_formsets_valid = all_formsets_valid and itemEnergiaFormset.is_valid()
             formsets_energia.append(itemEnergiaFormset)
-        if tarifaForm.is_valid() and escalaFormset.is_valid() and all_formsets_valid:
+        if tarifaForm.is_valid() and escalasFormset.is_valid() and all_formsets_valid:
             tarifa = tarifaForm.save()
-            EscalaFormset = formset_factory(EscalasForm, extra=0)
+            EscalaFormset = formset_factory(EscalasForm, escala_formset, extra=0)
             escalaFormset = EscalaFormset(request.POST, prefix='escala')
             for i, form in enumerate(escalaFormset.forms):
                 escala = AgrupacionDeItems(tarifa=tarifa,
@@ -156,7 +156,7 @@ def tarifaConfiguracion(request):
 
     else:
         tarifaForm = TarifaForm()
-        EscalasFormset = formset_factory(EscalasForm, extra=1)
+        EscalasFormset = formset_factory(EscalasForm, escala_formset, extra=1)
         escalasFormset = EscalasFormset(prefix='escala')
         ItemsFijos = formset_factory(ItemsFijoForm, extra=0)
         formsets_fijos = []

@@ -34,5 +34,17 @@
       "base": true,
       "requerido": true
     }
+  },
+  {
+    "model": "prepapp.Items",
+    "pk": 4,
+    "fields": {
+      "nombre": "ERSEP Norte y Noroeste",
+      "tipo": "ESC",
+      "aplicacion": "EN",
+      "servicios": "ENER",
+      "base": true,
+      "requerido": true
+    }
   }
 ]
