@@ -17,7 +17,8 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table, get_items_table, get_cesp_table, \
-    get_items_fijos_fk, get_items_energia_fk, get_items_fijos_req, get_items_energia_req, get_tarifas_table
+    get_items_fijos_fk, get_items_energia_fk, get_items_fijos_req, get_items_energia_req, get_tarifas_table, \
+    get_items_tipo
 from prepapp.views import SociosList, SociosAlta, SociosModificar, TerrenoList, TerrenoAlta, TerrenoModificar, \
     TarifaList, CespList, CespAlta, CespModificar, sociosSuspender, sociosHabilitar, \
     terrenosSuspender, terrenosHabilitar, ItemsList, ItemsAlta, ItemsModificar, itemsSuspender, itemsHabilitar, \
@@ -68,6 +69,7 @@ itemsPatterns = [
     url(r'get_items_energia_fk/$', get_items_energia_fk, name='get_items_energia_fk'),
     url(r'get_items_fijos_req/$', get_items_fijos_req, name='get_items_fijos_req'),
     url(r'get_items_energia_req/$', get_items_energia_req, name='get_items_energia_req'),
+    url(r'get_items_tipo/$', get_items_tipo, name='get_items_tipo'),
 ]
 
 cargosFijosPatterns = [

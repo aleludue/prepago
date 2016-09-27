@@ -1,38 +1,268 @@
 [
   {
-    "model": "prepapp.Items",
-    "pk": 1,
     "fields": {
-      "nombre": "CF Energia",
+      "iva_monotributo": "21.00",
+      "servicios": "ENER",
+      "iva_nograv": "21.00",
       "tipo": "FIJ",
+      "iva_consfinal": "21.00",
+      "iva_exento": "21.00",
+      "iva_ri": "27.00",
+      "activo": true,
       "aplicacion": "CF",
-      "servicios": "ENER",
       "base": true,
-      "requerido": true
-    }
+      "requerido": true,
+      "iva_sujnocat": "21.00",
+      "nombre": "CF Energia"
+    },
+    "model": "prepapp.items",
+    "pk": 1
   },
   {
-    "model": "prepapp.Items",
-    "pk": 2,
     "fields": {
-      "nombre": "Energia",
-      "tipo": "ESC",
-      "aplicacion": "EN",
+      "iva_monotributo": "21.00",
       "servicios": "ENER",
+      "iva_nograv": "21.00",
+      "tipo": "ESC",
+      "iva_consfinal": "21.00",
+      "iva_exento": "21.00",
+      "iva_ri": "27.00",
+      "activo": true,
+      "aplicacion": "EN",
       "base": true,
-      "requerido": true
-    }
+      "requerido": true,
+      "iva_sujnocat": "21.00",
+      "nombre": "Energia"
+    },
+    "model": "prepapp.items",
+    "pk": 2
   },
   {
-    "model": "prepapp.Items",
-    "pk": 3,
     "fields": {
-      "nombre": "ERSEP Norte y Noroeste",
-      "tipo": "ESC",
-      "aplicacion": "EN",
+      "iva_monotributo": "21.00",
       "servicios": "ENER",
+      "iva_nograv": "21.00",
+      "tipo": "ESC",
+      "iva_consfinal": "21.00",
+      "iva_exento": "21.00",
+      "iva_ri": "27.00",
+      "activo": true,
+      "aplicacion": "EN",
       "base": true,
-      "requerido": true
-    }
+      "requerido": true,
+      "iva_sujnocat": "21.00",
+      "nombre": "ERSEP Norte y Noroeste"
+    },
+    "model": "prepapp.items",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "iva_monotributo": "0.00",
+      "servicios": "ENER",
+      "iva_nograv": "0.00",
+      "tipo": "POR",
+      "iva_consfinal": "0.00",
+      "iva_exento": "0.00",
+      "iva_ri": "0.00",
+      "activo": true,
+      "aplicacion": "EN",
+      "base": false,
+      "requerido": false,
+      "iva_sujnocat": "0.00",
+      "nombre": "Alumbrado Brinkmann (Energia)"
+    },
+    "model": "prepapp.items",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "iva_monotributo": "21.00",
+      "servicios": "ENER",
+      "iva_nograv": "21.00",
+      "tipo": "ESC",
+      "iva_consfinal": "21.00",
+      "iva_exento": "21.00",
+      "iva_ri": "27.00",
+      "activo": true,
+      "aplicacion": "EN",
+      "base": true,
+      "requerido": true,
+      "iva_sujnocat": "21.00",
+      "nombre": "ERSEP Coie"
+    },
+    "model": "prepapp.items",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "iva_monotributo": "21.00",
+      "servicios": "ENER",
+      "iva_nograv": "21.00",
+      "tipo": "ESC",
+      "iva_consfinal": "21.00",
+      "iva_exento": "21.00",
+      "iva_ri": "27.00",
+      "activo": true,
+      "aplicacion": "EN",
+      "base": true,
+      "requerido": true,
+      "iva_sujnocat": "21.00",
+      "nombre": "ERSEP Arroyo Cabral"
+    },
+    "model": "prepapp.items",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "iva_monotributo": "21.00",
+      "servicios": "ENER",
+      "iva_nograv": "21.00",
+      "tipo": "VAR",
+      "iva_consfinal": "21.00",
+      "iva_exento": "21.00",
+      "iva_ri": "27.00",
+      "activo": true,
+      "aplicacion": "EN",
+      "base": false,
+      "requerido": true,
+      "iva_sujnocat": "21.00",
+      "nombre": "Tasa Dec. 2298 ERSEP"
+    },
+    "model": "prepapp.items",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "iva_monotributo": "0.00",
+      "servicios": "ENER",
+      "iva_nograv": "0.00",
+      "tipo": "POR",
+      "iva_consfinal": "0.00",
+      "iva_exento": "0.00",
+      "iva_ri": "0.00",
+      "activo": true,
+      "aplicacion": "EN",
+      "base": false,
+      "requerido": false,
+      "iva_sujnocat": "0.00",
+      "nombre": "Capitalizacion"
+    },
+    "model": "prepapp.items",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "iva_monotributo": "0.00",
+      "servicios": "ENER",
+      "iva_nograv": "0.00",
+      "tipo": "VAR",
+      "iva_consfinal": "0.00",
+      "iva_exento": "0.00",
+      "iva_ri": "0.00",
+      "activo": true,
+      "aplicacion": "EN",
+      "base": false,
+      "requerido": false,
+      "iva_sujnocat": "0.00",
+      "nombre": "Tasa Dec. 27/2015 ERSEP"
+    },
+    "model": "prepapp.items",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "iva_monotributo": "21.00",
+      "servicios": "AGUA",
+      "iva_nograv": "21.00",
+      "tipo": "FIJ",
+      "iva_consfinal": "21.00",
+      "iva_exento": "21.00",
+      "iva_ri": "27.00",
+      "activo": true,
+      "aplicacion": "CF",
+      "base": true,
+      "requerido": true,
+      "iva_sujnocat": "21.00",
+      "nombre": "Consumo m\u00ednimo de agua (12.00m3)"
+    },
+    "model": "prepapp.items",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "iva_monotributo": "0.00",
+      "servicios": "ACUE",
+      "iva_nograv": "0.00",
+      "tipo": "FIJ",
+      "iva_consfinal": "0.00",
+      "iva_exento": "0.00",
+      "iva_ri": "0.00",
+      "activo": true,
+      "aplicacion": "CF",
+      "base": false,
+      "requerido": false,
+      "iva_sujnocat": "0.00",
+      "nombre": "Cuota Coop Policial C"
+    },
+    "model": "prepapp.items",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "iva_monotributo": "0.00",
+      "servicios": "SERV",
+      "iva_nograv": "0.00",
+      "tipo": "FIJ",
+      "iva_consfinal": "0.00",
+      "iva_exento": "0.00",
+      "iva_ri": "0.00",
+      "activo": true,
+      "aplicacion": "CF",
+      "base": false,
+      "requerido": false,
+      "iva_sujnocat": "0.00",
+      "nombre": "Serv. Sepelio"
+    },
+    "model": "prepapp.items",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "iva_monotributo": "0.00",
+      "servicios": "ENER",
+      "iva_nograv": "0.00",
+      "tipo": "POR",
+      "iva_consfinal": "0.00",
+      "iva_exento": "0.00",
+      "iva_ri": "0.00",
+      "activo": true,
+      "aplicacion": "CF",
+      "base": false,
+      "requerido": false,
+      "iva_sujnocat": "0.00",
+      "nombre": "Alumbrado Publico (Cargo Fijo)"
+    },
+    "model": "prepapp.items",
+    "pk": 13
+  },
+  {
+    "fields": {
+      "iva_monotributo": "0.00",
+      "servicios": "ENER",
+      "iva_nograv": "0.00",
+      "tipo": "VAR",
+      "iva_consfinal": "0.00",
+      "iva_exento": "0.00",
+      "iva_ri": "0.00",
+      "activo": true,
+      "aplicacion": "CF",
+      "base": false,
+      "requerido": false,
+      "iva_sujnocat": "0.00",
+      "nombre": "Capitalizacion"
+    },
+    "model": "prepapp.items",
+    "pk": 14
   }
 ]
