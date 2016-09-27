@@ -288,14 +288,14 @@ def tarifaEdicion(request, pk):
         ItemsFijos = formset_factory(ItemsFijoForm, extra=0)
         formsets_fijos = []
         for idx, escala in enumerate(tarifa.agrupaciondeitems_set.all()):
-            initial_fijos = [{'item': cf.item, 'valor': cf.valor_escalonado()} for cf in
+            initial_fijos = [{'asoc': cf, 'item': cf.item, 'valor': cf.valor_escalonado()} for cf in
                              escala.asociacionitemagrupacion_set.filter(item__aplicacion='CF')]
             itemsFijos = ItemsFijos(prefix='fijos-' + str(idx), initial=initial_fijos)
             formsets_fijos.append(itemsFijos)
         ItemsEnergia = formset_factory(ItemsEnergiaForm, extra=0)
         formsets_energia = []
         for idx, escala in enumerate(tarifa.agrupaciondeitems_set.all()):
-            initial_energia = [{'item': cf.item, 'valor': cf.valor_escalonado()} for cf in
+            initial_energia = [{'asoc': en, 'item': en.item, 'valor': en.valor_escalonado()} for en in
                                escala.asociacionitemagrupacion_set.filter(item__aplicacion='EN')]
             itemsEnergia = ItemsEnergia(prefix='energia-' + str(idx), initial=initial_energia)
             formsets_energia.append(itemsEnergia)

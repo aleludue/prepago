@@ -75,6 +75,11 @@ def get_items_energia_req(request):
     return HttpResponse(s.read())
 
 
+def get_items_tipo(request):
+    item = Items.objects.get(pk=request.GET['pk'])
+    return HttpResponse(item.get_tipo_display())
+
+
 def _getattr_foreingkey(obj, attr):
     pt = attr.count('.')
     if pt == 0:  # No hay clave foranea
