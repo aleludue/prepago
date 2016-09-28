@@ -89,8 +89,10 @@ class TarifaList(TemplateView):
 def tarifaConfiguracion(request):
     if request.method == 'POST':  # If the form has been submitted...
         tarifaForm = TarifaForm(request.POST)
+        tarifaForm.full_clean()
         EscalaFormset = formset_factory(EscalasForm, escala_formset, extra=0)
         escalasFormset = EscalaFormset(request.POST, prefix='escala')
+        escalasFormset.full_clean()
         formsets_fijos = formsets_energia = []
         all_formsets_valid = True
         for i, escala in enumerate(escalasFormset.forms):

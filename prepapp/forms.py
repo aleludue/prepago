@@ -244,14 +244,16 @@ class EscalasForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(EscalasForm, self).clean()
-        has = cleaned_data['hasta']
-        des = cleaned_data['desde']
-        if has < des:
-            raise forms.ValidationError("El valor del campo 'hasta' no puede ser inferior al valor del campo 'desde'.")
-        elif has == des:
-            raise forms.ValidationError("El valor del campo 'desde' y 'hasta' no pueden ser iguales.")
-        return cleaned_data
-
+        try:
+            has = cleaned_data['hasta']
+            des = cleaned_data['desde']
+            if has < des:
+                raise forms.ValidationError("El valor del campo 'hasta' no puede ser inferior al valor del campo 'desde'.")
+            elif has == des:
+                raise forms.ValidationError("El valor del campo 'desde' y 'hasta' no pueden ser iguales.")
+            return cleaned_data
+        except KeyError:
+            pass
 
 class ItemsEnergiaForm(forms.Form):
     asoc = forms.ModelChoiceField(queryset=AsociacionItemAgrupacion.objects.filter(item__aplicacion='EN'),
@@ -308,17 +310,17 @@ class ImportacionAguaForm(MDLBaseForm):
     ano = CharFieldMDL(max_length=4, required=True, label='Año')
 
 class escala_formset(BaseFormSet):
+    def __init__(self, *args, **kwargs):
+        super(escala_formset, self).__init__(*args, **kwargs)
+        for form in self.forms:
+            form.empty_permitted = False
+
     def clean(self):
         i = 0
         hasta = 0
+        if any(self.errors):# Don't bother validating the formset unless each form is valid on its own
+            return
         for form in self.forms:
-            if not form.cleaned_data:
-                raise forms.ValidationError("Las escalas no pueden tener campos vacios.")
-            # elif not form.cleaned_data['hasta']:
-            #     raise forms.ValidationError("Campo 'hasta' vacio.")
-            # elif not form.cleaned_data['desde']:
-            #     raise forms.ValidationError("Campo 'desde' vacio.")
-
             if i > 0:
                 desde = form.cleaned_data['desde']
                 if desde == hasta+1:
@@ -329,4 +331,4 @@ class escala_formset(BaseFormSet):
             else:
                 hasta = form.cleaned_data['hasta']
             i += 1
-        return hasta
+        return self.cleaned_data

@@ -169,6 +169,7 @@
                         <div class="mdl-textfield mdl-js-textfield">
                             {{ tarifaForm.nombre }}
                             {{ tarifaForm.nombre.label_tag }}
+                            {{ tarifaForm.nombre.errors }}
                         </div>
                     </div>
                 </div>
@@ -190,6 +191,7 @@
                                 <tr class="escala">
                                     <td class="columna_desde">
                                         {{ escala.desde }}
+                                        {{ escala.desde.errors }}
                                     </td>
                                     <td class="columna_hasta">
                                         {{ escala.hasta }}
