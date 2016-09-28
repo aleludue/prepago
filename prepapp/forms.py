@@ -230,11 +230,15 @@ class EscalasForm(forms.Form):
     hasta = forms.IntegerField()
 
     def clean(self):
-        has = self.cleaned_data['hasta']
-        des = self.cleaned_data['desde']
+        cleaned_data = super(EscalasForm, self).clean()
+        has = cleaned_data['hasta']
+        des = cleaned_data['desde']
         if has < des:
-            raise forms.ValidationError("El valor del campo 'hasta' no puede ser inferior al valor del campo 'desde'")
-        return self.cleaned_data
+            raise forms.ValidationError("El valor del campo 'hasta' no puede ser inferior al valor del campo 'desde'.")
+        elif has == des:
+            raise forms.ValidationError("El valor del campo 'desde' y 'hasta' no pueden ser iguales.")
+        return cleaned_data
+
 
 class ItemsEnergiaForm(forms.Form):
     asoc = forms.ModelChoiceField(queryset=AsociacionItemAgrupacion.objects.filter(item__aplicacion='EN'),
@@ -290,9 +294,26 @@ class ImportacionAguaForm(MDLBaseForm):
     mes = ChoiceFieldMDL(choices=tuple([(item, item) for item in range(1, 13)]), required=True, label='')
     ano = CharFieldMDL(max_length=4, required=True, label='Año')
 
-
-class RequiredFormSet(BaseFormSet):
-    def __init__(self, *args, **kwargs):
-        super(RequiredFormSet, self).__init__(*args, **kwargs)
+class escala_formset(BaseFormSet):
+    def clean(self):
+        i = 0
+        hasta = 0
         for form in self.forms:
-            form.empty_permitted = False
+            if not form.cleaned_data:
+                raise forms.ValidationError("Las escalas no pueden tener campos vacios.")
+            # elif not form.cleaned_data['hasta']:
+            #     raise forms.ValidationError("Campo 'hasta' vacio.")
+            # elif not form.cleaned_data['desde']:
+            #     raise forms.ValidationError("Campo 'desde' vacio.")
+
+            if i > 0:
+                desde = form.cleaned_data['desde']
+                if desde == hasta+1:
+                    hasta = form.cleaned_data['hasta']
+                else:
+                    raise forms.ValidationError("Las escalas no son correlativas entre si.")
+                    hasta = form.cleaned_data['hasta']
+            else:
+                hasta = form.cleaned_data['hasta']
+            i += 1
+        return hasta
