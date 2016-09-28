@@ -7,23 +7,11 @@ from django import forms
 from django.db import models
 from django.forms import widgets, utils
 from django.forms.fields import CharField
+from django.forms.formsets import BaseFormSet
 from django.utils import encoding, html, safestring
 
 from prepapp import multiupload
 from prepapp.models import Socio, Terreno, Tarifa, Escalones, Items, Cesp, AsociacionItemAgrupacion, AgrupacionDeItems
-
-
-def charfield_handler(field):
-    attrs = {}
-    if field.max_length > 0:
-        if field.min_length >= 0:
-            attrs.update(
-                {'data-validation': 'length', 'data-validation-length': '%s-%s' % (field.min_length, field.max_length)})
-        else:
-            attrs.update({'data-validation': 'length', 'data-validation-length': 'max%s' % field.max_length})
-    elif field.required:
-        attrs.update({'data-validation': 'required'})
-    return attrs
 
 
 #####   WIDGET's    #####
@@ -241,12 +229,12 @@ class EscalasForm(forms.Form):
     desde = forms.IntegerField()
     hasta = forms.IntegerField()
 
-    def clean_hasta(self):
+    def clean(self):
         has = self.cleaned_data['hasta']
         des = self.cleaned_data['desde']
         if has < des:
             raise forms.ValidationError("El valor del campo 'hasta' no puede ser inferior al valor del campo 'desde'")
-        return has
+        return self.cleaned_data
 
 class ItemsEnergiaForm(forms.Form):
     asoc = forms.ModelChoiceField(queryset=AsociacionItemAgrupacion.objects.filter(item__aplicacion='EN'),
@@ -301,3 +289,10 @@ class ImportacionAguaForm(MDLBaseForm):
     agua = multiupload.MultiFileField(required=True, label='')
     mes = ChoiceFieldMDL(choices=tuple([(item, item) for item in range(1, 13)]), required=True, label='')
     ano = CharFieldMDL(max_length=4, required=True, label='Año')
+
+
+class RequiredFormSet(BaseFormSet):
+    def __init__(self, *args, **kwargs):
+        super(RequiredFormSet, self).__init__(*args, **kwargs)
+        for form in self.forms:
+            form.empty_permitted = False
