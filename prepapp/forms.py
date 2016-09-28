@@ -14,19 +14,6 @@ from prepapp import multiupload
 from prepapp.models import Socio, Terreno, Tarifa, Escalones, Items, Cesp, AsociacionItemAgrupacion, AgrupacionDeItems
 
 
-def charfield_handler(field):
-    attrs = {}
-    if field.max_length > 0:
-        if field.min_length >= 0:
-            attrs.update(
-                {'data-validation': 'length', 'data-validation-length': '%s-%s' % (field.min_length, field.max_length)})
-        else:
-            attrs.update({'data-validation': 'length', 'data-validation-length': 'max%s' % field.max_length})
-    elif field.required:
-        attrs.update({'data-validation': 'required'})
-    return attrs
-
-
 #####   WIDGET's    #####
 
 class AutoCompleteFKMultiWidget(widgets.MultiWidget):
@@ -239,8 +226,8 @@ class TarifaForm(MDLBaseModelForm):
 class EscalasForm(forms.Form):
     escala = forms.ModelChoiceField(queryset=AgrupacionDeItems.objects.all(), widget=forms.HiddenInput(),
                                     required=False)
-    desde = forms.IntegerField(required=True)
-    hasta = forms.IntegerField(required=True)
+    desde = forms.IntegerField()
+    hasta = forms.IntegerField()
 
     def clean(self):
         cleaned_data = super(EscalasForm, self).clean()
