@@ -13,7 +13,7 @@ from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView
 
 from prepapp.forms import SociosForm, TerrenosForm, TarifaForm, CespForm, EscalasForm, ItemsFijoForm, ItemsEnergiaForm, \
-    ItemsForm, ImportacionAguaForm, escala_formset
+    ItemsForm, ImportacionAguaForm, escala_formset, CambioMedidorForm
 from prepapp.models import Socio, Terreno, Tarifa, Escalones, Cesp, Items, AgrupacionDeItems, AsociacionItemAgrupacion, \
     LecturasAgua
 
@@ -404,3 +404,12 @@ class ImportacionAgua(View):
             return render_to_response("importacion/importacion_terminada.html", c)
         c = {'form': form}
         return render(request, "importacion/importacion_terminada.html", c)
+
+class ImportacionList(TemplateView):
+    template_name = "importacion/importacion_list.html"
+
+class ImportacionCambioMedidor(CreateView):
+    template_name = "importacion/importacion_cambiomedidor.html"
+    model = LecturasAgua
+    form_class = CambioMedidorForm
+    success_url = reverse_lazy('ImportacionList')

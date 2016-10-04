@@ -11,7 +11,7 @@ from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 
-from prepapp.models import Socio, Terreno, Items, Cesp, Tarifa
+from prepapp.models import Socio, Terreno, Items, Cesp, Tarifa, LecturasAgua
 
 
 def get_socios_fk(request):
@@ -27,7 +27,6 @@ def get_socios_fk(request):
     json.dump(socios, s)
     s.seek(0)
     return HttpResponse(s.read())
-
 
 def get_items_fijos_fk(request):
     phrase = request.GET['ph']
@@ -236,9 +235,9 @@ def get_socios_table(request):
 def get_terrenos_table(request):
     # SETEOS INICIALES
     objects = Terreno.objects.all()
-    list_display = ['nroTerreno', 'socio__nroSocio', 'socio__razonSocial', 'domicilio', 'tarifa']
-    list_global_search = list_display[0:2]
-    data_struct = {0: 'nroTerreno', 1: 'socio__nroSocio', 2: 'socio__razonSocial', 3: 'domicilio', 4: 'tarifa'}
+    list_display = ['nroTerreno', 'socio.nroSocio', 'socio.razonSocial', 'domicilio', 'tarifa.nombre']
+    list_global_search = ['nroTerreno', 'socio__nroSocio', 'socio__razonSocial']
+    data_struct = {0: 'nroTerreno', 1: 'socio__nroSocio', 2: 'socio__razonSocial', 3: 'domicilio', 4: 'tarifa__nombre'}
 
     # Cuenta total de articulos:
     recordsTotal = objects.count()
@@ -260,6 +259,7 @@ def get_terrenos_table(request):
     # extract information
     data = make_data(objects, list_display, "TerrenosModificar", "TerrenosSuspender", "TerrenosHabilitar")
     # define response
+    print data
     response = {
         'data': data,
         'recordsTotal': recordsTotal,
@@ -409,6 +409,49 @@ def get_tarifas_table(request):
                     url_modif, args=[obj.pk]))
         data.append(row)
 
+    # define response
+    response = {
+        'data': data,
+        'recordsTotal': recordsTotal,
+        'recordsFiltered': recordsFiltered,
+        'draw': request.GET['draw']
+    }
+
+    # serialize to json
+    s = StringIO()
+    json.dump(response, s)
+    s.seek(0)
+    return HttpResponse(s.read())
+
+def get_agua_table(request):
+    # SETEOS INICIALES
+    objects = LecturasAgua.objects.all()
+    list_display = ['terreno.socio.razonSocial', 'terreno.nroTerreno', 'mes', 'ano', 'medidorAgua', 'lectura']
+    list_global_search = ['terreno__socio__razonSocial', 'terreno__nroTerreno', 'mes', 'ano', 'medidorAgua']
+    data_struct = {0: 'terreno__socio__razonSocial', 1: 'terreno__nroTerreno', 2: 'mes', 3: 'ano', 4: 'medidorAgua', 5: 'lectura'}
+
+    # Cuenta total de articulos:
+    recordsTotal = objects.count()
+
+    # Filtrado de los bancos
+    objects = filtering(request.GET, objects, data_struct, list_global_search)
+
+    # Ordenado
+    objects = ordering(request.GET, objects, data_struct)
+
+    # Conteo de articulos despues dle filtrado
+    recordsFiltered = objects.count()
+
+    # finally, slice according to length sent by dataTables:
+    start = int(request.GET['start'])
+    length = int(request.GET['length'])
+    objects = objects[start: (start + length)]
+
+    # extract information
+    data = []
+    for obj in objects:
+        row = map(lambda field: _getattr_foreingkey(obj, field), list_display)
+        data.append(row)
     # define response
     response = {
         'data': data,

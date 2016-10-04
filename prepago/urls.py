@@ -18,12 +18,12 @@ from django.contrib import admin
 
 from prepapp.api import get_socios_fk, get_socios_table, get_terrenos_table, get_items_table, get_cesp_table, \
     get_items_fijos_fk, get_items_energia_fk, get_items_fijos_req, get_items_energia_req, get_tarifas_table, \
-    get_items_tipo
+    get_items_tipo, get_agua_table
 from prepapp.views import SociosList, SociosAlta, SociosModificar, TerrenoList, TerrenoAlta, TerrenoModificar, \
     TarifaList, CespList, CespAlta, CespModificar, sociosSuspender, sociosHabilitar, \
     terrenosSuspender, terrenosHabilitar, ItemsList, ItemsAlta, ItemsModificar, itemsSuspender, itemsHabilitar, \
     sociosSuspender, sociosHabilitar, terrenosSuspender, terrenosHabilitar, tarifaConfiguracion, ImportacionAgua, \
-    tarifaEdicion
+    tarifaEdicion, ImportacionList, ImportacionCambioMedidor
 
 sociosPatterns = [
     url(r'list/$', SociosList.as_view(), name="SociosList"),
@@ -74,6 +74,9 @@ itemsPatterns = [
 
 cargosFijosPatterns = [
     url(r'importacion/$', ImportacionAgua.as_view(), name="ImportacionAgua"),
+    url(r'list/$', ImportacionList.as_view(), name="ImportacionList"),
+    url(r'cambiomedidor/$', ImportacionCambioMedidor.as_view(), name="CambioMedidor"),
+    url(r'get_agua_table/$', get_agua_table, name='get_agua_table'),
 ]
 
 urlpatterns = [

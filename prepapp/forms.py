@@ -11,7 +11,8 @@ from django.forms.formsets import BaseFormSet
 from django.utils import encoding, html, safestring
 
 from prepapp import multiupload
-from prepapp.models import Socio, Terreno, Tarifa, Escalones, Items, Cesp, AsociacionItemAgrupacion, AgrupacionDeItems
+from prepapp.models import Socio, Terreno, Tarifa, Escalones, Items, Cesp, AsociacionItemAgrupacion, AgrupacionDeItems, \
+    LecturasAgua
 
 
 #####   WIDGET's    #####
@@ -295,6 +296,13 @@ class ImportacionAguaForm(MDLBaseForm):
     agua = multiupload.MultiFileField(required=True, label='')
     mes = ChoiceFieldMDL(choices=tuple([(item, item) for item in range(1, 13)]), required=True, label='')
     ano = CharFieldMDL(max_length=4, required=True, label='Año')
+
+class CambioMedidorForm(MDLBaseModelForm):
+    formfield_callback = customize_field
+
+    class Meta:
+        model = LecturasAgua
+        fields = ['mes', 'ano', 'terreno', 'medidorAgua', 'lectura']
 
 class escala_formset(BaseFormSet):
     def __init__(self, *args, **kwargs):

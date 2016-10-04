@@ -68,7 +68,7 @@ class Tarifa(models.Model):
     nombre = models.CharField(max_length=30, help_text="Nombre de la tarifa.")
 
     def __unicode__(self):
-        return self.nombre
+        return "%s" % self.nombre
 
 
 class AgrupacionDeItems(models.Model):
